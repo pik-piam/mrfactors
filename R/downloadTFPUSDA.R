@@ -3,7 +3,7 @@
 #'
 #' @return raw TFP file from USDA
 #' @author Edna J. Molina Bacca
-#' @importFrom utils download.file
+#' @importFrom utils download.file person
 #' @seealso [downloadSource()]
 #'
 downloadTFPUSDA <- function() {

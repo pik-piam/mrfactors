@@ -5,6 +5,7 @@
 #' @return A MAgPIE object containing national-scale costs of production for
 #' 10 crops, disaggregated in 9 distinct cost elements
 #' @author Debbora Leip
+#' @importFrom dplyr %>%
 
 convertVittis <- function(x) {
   # map to MAgPIE categories with global crop areas as weights
