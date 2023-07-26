@@ -4,8 +4,8 @@ Title: MADRaT based package on factor inputs
 Version: 0.1.0
 Date: 2023-07-25
 Authors@R:
-    person("Debbora", "Leip", , "leip@pik-potsdam.de", role = c("aut", "cre")),
-    person("Edna", "Molina Bacca", role = "aut")
+    c(person("Debbora", "Leip", , "leip@pik-potsdam.de", role = c("aut", "cre")),
+      person("Edna", "Molina Bacca", role = "aut"))
 Description: This package provides functions for MAgPIE input data on factor inputs to agricultural production (with a focus on capital and labor).
 License: LGPL-3
 URL: https://github.com/pik-piam/mrfactors
