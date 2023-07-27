@@ -7,7 +7,7 @@ Authors@R:
     c(person("Debbora", "Leip", , "leip@pik-potsdam.de", role = c("aut", "cre")),
       person("Edna", "Molina Bacca", role = "aut"))
 Description: This package provides functions for MAgPIE input data on factor inputs to agricultural production (with a focus on capital and labor).
-License: LGPL-3
+License: LGPL-3 | file LICENSE
 URL: https://github.com/pik-piam/mrfactors
 Depends:
     R (>= 2.10.0),
