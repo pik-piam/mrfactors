@@ -2,14 +2,16 @@ cff-version: 1.2.0
 message: If you use this software, please cite it using the metadata from this file.
 type: software
 title: 'mrfactors: MADRaT based package on factor inputs'
-version: 0.1.0
-date-released: '2023-07-25'
+version: 0.2.0
+date-released: '2023-07-28'
 abstract: This package provides functions for MAgPIE input data on factor inputs to
   agricultural production (with a focus on capital and labor).
 authors:
 - family-names: Leip
   given-names: Debbora
   email: leip@pik-potsdam.de
+- family-names: Molina Bacca
+  given-names: Edna
 license: LGPL-3.0
 repository-code: https://github.com/pik-piam/mrfactors
 

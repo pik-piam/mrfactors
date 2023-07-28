@@ -1,6 +1,6 @@
 #' MADRaT based package on factor inputs
 #'
-#' This package provides functions for MAgPIE input data on factor inputs to agricultural production 
+#' This package provides functions for MAgPIE input data on factor inputs to agricultural production
 #' (with a focus on capital and labor).
 #'
 #' @name mrfactors-package

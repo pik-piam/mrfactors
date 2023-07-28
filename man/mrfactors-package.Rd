@@ -2,20 +2,13 @@
 % Please edit documentation in R/mrfactors-package.R
 \docType{package}
 \name{mrfactors-package}
-\alias{mrfactors}
 \alias{mrfactors-package}
-\title{mrfactors: MADRaT based package on factor inputs}
+\alias{mrfactors}
+\title{MADRaT based package on factor inputs}
 \description{
-This package provides functions for MAgPIE input data on factor inputs to agricultural production (with a focus on capital and labor).
-}
-\seealso{
-Useful links:
-\itemize{
-  \item \url{https://github.com/pik-piam/mrfactors}
-}
-
+This package provides functions for MAgPIE input data on factor inputs to agricultural production
+(with a focus on capital and labor).
 }
 \author{
-\strong{Maintainer}: Debbora Leip \email{leip@pik-potsdam.de}
-
+Maintainer: Debbora Leip <leip@pik-potsdam.de>
 }
