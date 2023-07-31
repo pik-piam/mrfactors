@@ -6,7 +6,7 @@
 #' share of people employed in agriculture (out of total population) and the log (base 10) of GDP pc PPP05.
 #' "HourlyLaborCosts" for a regression between  mean nominal hourly labor cost per employee in
 #' agriculture and GDP pc MER05.
-#' @param dataVersion which version of the ILO input data and regression to use. "" for the oldest version and
+#' @param dataVersionILO which version of the ILO input data and regression to use. "" for the oldest version and
 #' old regression, or "monthYear" (e.g. "July23") for newer data with the new regression type
 #' @param thresholdEmplShare for a certain level of GDP pc PPP, the regresion between employment share and
 #' GDP pc PPP will lead to a share of 0 and which will then go up again for even higher GDP pc PPP. Therefore,
@@ -23,17 +23,18 @@
 #'     a <- calcOutput("RegressionsILO", subtype = "HourlyLaborCosts")
 #' }
 
-calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersion = "July23", thresholdEmplShare = 1e-4,
+calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "July23", thresholdEmplShare = 1e-4,
                                thresholdWage = 0.1, forceWageIntercept = TRUE, recalculate = FALSE) {
 
   if (isFALSE(recalculate)) {
-    regCoeffs <- readSource("RegressionsILO", subtype = subtype, version = dataVersion)
+    subtypeVersion <- ifelse(dataVersionILO == "", subtype, paste(subtype, dataVersionILO, sep = "_"))
+    regCoeffs <- readSource("RegressionsILO", subtype = subtypeVersion)
 
     if (subtype == "AgEmplShare") {
       description <- paste0("Regression coeffcients for sqrt(ag. empl. share) ~ log(GDP pc PPP, base = 10) ",
                           "and a empl. share threshold")
     } else if (subtype == "HourlyLaborCosts") {
-      if (dataVersion == "") {
+      if (dataVersionILO == "") {
         description <- paste0("Regression coeffcients for hourly labor costs ~ GDP pc MER, ",
                             "and a wage threshold")
       } else {
@@ -60,8 +61,8 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersion = "July23", 
                         "and a empl. share threshold")
 
     # read original employment dataset from ILO (convert from thous. to mil.)
-    dataType <- ifelse(dataVersion == "", "EmplByActivityModelled",
-                       paste("EmplByActivityModelled", dataVersion, sep = "_"))
+    dataType <- ifelse(dataVersionILO == "", "EmplByActivityModelled",
+                       paste("EmplByActivityModelled", dataVersionILO, sep = "_"))
     iloEmpl <- readSource("ILOSTAT", dataType)[, , "Aggregate: Agriculture"] / 1000
     getNames(iloEmpl, dim = 2) <- "Agriculture, forestry and fishing"
 
@@ -100,7 +101,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersion = "July23", 
     data$transformedshareEmplAg <- sqrt(data$shareEmplAg)
 
     # regression
-    reg       <- lm(transformedshareEmplAg ~ transformedGDPpcPPP, data = data, weights = population)
+    reg       <- lm(transformedshareEmplAg ~ transformedGDPpcPPP, data = data, weights = `population`)
     intercept <- reg$coefficients["(Intercept)"][[1]]
     slope     <- reg$coefficients["transformed_GDPpcPPP"][[1]]
 
@@ -121,8 +122,8 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersion = "July23", 
     ## HOURLY LABOR COSTS DATA FROM ILO
 
     # original hourly labor costs dataset (ILO data + data for India + data for China)
-    datasource <- ifelse(dataVersion == "", "ILO", paste("ILO", dataVersion, sep = "_"))
-    hourlyLaborCosts <- calcOutput("HourlyLaborCosts", datasource = datasource,
+    datasource <- ifelse(dataVersionILO == "", "ILO", paste("ILO", dataVersionILO, sep = "_"))
+    hourlyLaborCosts <- calcOutput("HourlyLaborCosts", dataVersionILO = dataVersionILO, datasource = datasource,
                                   fillWithRegression = FALSE, aggregate = FALSE)
     hourlyLaborCosts[hourlyLaborCosts == 0] <- NA
 
@@ -136,7 +137,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersion = "July23", 
     data  <- reshape(data, idvar = c("Region", "Year"), timevar = "Data1", direction = "wide")
     colnames(data) <- c("Region", "Year", "LaborCosts", "gdpPcMER")
 
-    if (dataVersion == "") {
+    if (dataVersionILO == "") {
       if (thresholdWage != 0.1) warning(paste0("You changed the wage threshold. This option was included ",
                                               "for testing purposes. Might lead to inconsistencies with ",
                                               "functions using the default regression (e.g. calcLaborCosts ",

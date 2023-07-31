@@ -6,8 +6,8 @@
 #' \item `HourlyLaborCosts`: regression coefficients for hourly labor costs ~ GDP pc MER (old version) or
 #' log(hourly labor costs) ~ log(GDP pc MER) (new version)
 #' }
-#' @param version version of regression and underlying data. "" for the oldest version, or "monthYear" (e.g. "July23")
-#' for newer version
+#' The version of regression and underlying data can be chosen by adding a suffix to the subtype, "" for the oldest 
+#' version, or "_monthYear" (e.g. "_July23") for newer version
 #' @return regression coefficients as MAgPIE object
 #' @author Debbora Leip
 #' @examples
@@ -16,14 +16,13 @@
 #' }
 #' @importFrom magclass read.magpie
 
-readRegressionsILO <- function(subtype = "AgEmplShare", version = "July23") {
+readRegressionsILO <- function(subtype = "AgEmplShare") {
 
-  # valid subtype?
-  if (!(subtype %in% c("AgEmplShare", "HourlyLaborCosts"))) stop("Invalid subtype.")
+  # valid regression type?
+  regrType <- str_split(subtype, "_")[[1]][1]
+  if (!(regrType %in% c("AgEmplShare", "HourlyLaborCosts"))) stop("Invalid subtype.")
 
   # valid version?
-  subtype <- ifelse(version == "", subtype,
-                      paste(subtype, version, sep = "_"))
   if (!file.exists(paste0(subtype, ".csv"))) {
     stop("This version of the regression has not been added to the source folder yet.")
   }
