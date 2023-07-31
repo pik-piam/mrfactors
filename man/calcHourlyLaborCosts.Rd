@@ -6,6 +6,7 @@
 \usage{
 calcHourlyLaborCosts(
   datasource = "USDA_FAO",
+  dataVersionILO = "July23",
   sector = "agriculture",
   fillWithRegression = TRUE,
   calibYear = 2010,
@@ -14,8 +15,10 @@ calcHourlyLaborCosts(
 }
 \arguments{
 \item{datasource}{either raw data from "ILO" (agriculture+forestry+fishery) or data calculated based on total labor
-costs from "USDA_FAO" (crop+livestock production). If source is ILO, the version can be chosen by adding a suffix
-("" for the oldest version, or "monthYear" (e.g. "July23") for a newer version)}
+costs from "USDA_FAO" (crop+livestock production).}
+
+\item{dataVersionILO}{Which version of ILO data to use (for hourly labor costs if source is ILO, for ag empl. if
+source is USDA_FAO). "" for the oldest version, or "monthYear" (e.g. "July23") for a newer version)}
 
 \item{sector}{should average hourly labor costs be reported ("agriculture"), or hourly labor costs specific to
 either "crops" or "livestock" production. For ILO only the aggregate hourly labor costs are available.}

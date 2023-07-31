@@ -6,7 +6,7 @@
 \usage{
 calcRegressionsILO(
   subtype = "AgEmplShare",
-  dataVersion = "July23",
+  dataVersionILO = "July23",
   thresholdEmplShare = 1e-04,
   thresholdWage = 0.1,
   forceWageIntercept = TRUE,
@@ -19,7 +19,7 @@ share of people employed in agriculture (out of total population) and the log (b
 "HourlyLaborCosts" for a regression between  mean nominal hourly labor cost per employee in
 agriculture and GDP pc MER05.}
 
-\item{dataVersion}{which version of the ILO input data and regression to use. "" for the oldest version and
+\item{dataVersionILO}{which version of the ILO input data and regression to use. "" for the oldest version and
 old regression, or "monthYear" (e.g. "July23") for newer data with the new regression type}
 
 \item{thresholdEmplShare}{for a certain level of GDP pc PPP, the regresion between employment share and

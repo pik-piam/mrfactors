@@ -1,8 +1,8 @@
 #' @title calcHourlyLaborCosts
 #' @description calculates dataset of hourly labor costs per employee in agriculture
 #' @param datasource either raw data from "ILO" (agriculture+forestry+fishery) or data calculated based on total labor
-#' costs from "USDA_FAO" (crop+livestock production). 
-#' @param dataVersionILO Which version of ILO data to use (for hourly labor costs if source is ILO, for ag empl. if 
+#' costs from "USDA_FAO" (crop+livestock production).
+#' @param dataVersionILO Which version of ILO data to use (for hourly labor costs if source is ILO, for ag empl. if
 #' source is USDA_FAO). "" for the oldest version, or "monthYear" (e.g. "July23") for a newer version)
 #' @param sector should average hourly labor costs be reported ("agriculture"), or hourly labor costs specific to
 #' either "crops" or "livestock" production. For ILO only the aggregate hourly labor costs are available.
@@ -90,7 +90,7 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "July
                             aggregate = FALSE)[, , c("Livestock", "Crops")]
 
       # total labor costs (calculated as VoP * labor cost share)
-      totalLaborCosts <- calcOutput("LaborCosts", dataVersionILO = dataVersionILO, datasource = "USDA", 
+      totalLaborCosts <- calcOutput("LaborCosts", dataVersionILO = dataVersionILO, datasource = "USDA",
                                     addSubsidies = TRUE, inclFish = FALSE, aggregate = FALSE)
 
       # average weekly hours worked per week
@@ -109,8 +109,8 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "July
 
       # which sector?
       if (sector != "agriculture") {
-        agEmpl <- agEmpl[, , stringr::str_to_title(sector)]
-        totalLaborCosts <- totalLaborCosts[, , stringr::str_to_title(sector)]
+        agEmpl <- agEmpl[, , str_to_title(sector)]
+        totalLaborCosts <- totalLaborCosts[, , str_to_title(sector)]
       } else {
         agEmpl <- dimSums(agEmpl, dim = 3)
         totalLaborCosts <- dimSums(totalLaborCosts, dim = 3)
@@ -122,7 +122,7 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "July
     }
 
   } else {
-    hourlyCosts <- calcOutput("HourlyLaborCosts", dataVersionILO = dataVersionILO, datasource = datasource, 
+    hourlyCosts <- calcOutput("HourlyLaborCosts", dataVersionILO = dataVersionILO, datasource = datasource,
                               sector = sector, fillWithRegression = FALSE, aggregate = FALSE)
 
     # calculate GDPpc [USD05MER] for regression

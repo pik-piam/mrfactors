@@ -4,7 +4,7 @@
 \alias{readRegressionsILO}
 \title{readRegressionsILO}
 \usage{
-readRegressionsILO(subtype = "AgEmplShare", version = "July23")
+readRegressionsILO(subtype = "AgEmplShare")
 }
 \arguments{
 \item{subtype}{Type of ILOSTAT data for which regression coefficients should be read
@@ -12,10 +12,9 @@ readRegressionsILO(subtype = "AgEmplShare", version = "July23")
 \item `AgEmplShare`: regression coefficients for sqr(ag empl share) ~ log(GDP pc PPP)
 \item `HourlyLaborCosts`: regression coefficients for hourly labor costs ~ GDP pc MER (old version) or
 log(hourly labor costs) ~ log(GDP pc MER) (new version)
-}}
-
-\item{version}{version of regression and underlying data. "" for the oldest version, or "monthYear" (e.g. "July23")
-for newer version}
+}
+The version of regression and underlying data can be chosen by adding a suffix to the subtype, "" for the oldest
+version, or "_monthYear" (e.g. "_July23") for newer version}
 }
 \value{
 regression coefficients as MAgPIE object

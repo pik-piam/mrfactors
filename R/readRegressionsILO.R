@@ -6,7 +6,7 @@
 #' \item `HourlyLaborCosts`: regression coefficients for hourly labor costs ~ GDP pc MER (old version) or
 #' log(hourly labor costs) ~ log(GDP pc MER) (new version)
 #' }
-#' The version of regression and underlying data can be chosen by adding a suffix to the subtype, "" for the oldest 
+#' The version of regression and underlying data can be chosen by adding a suffix to the subtype, "" for the oldest
 #' version, or "_monthYear" (e.g. "_July23") for newer version
 #' @return regression coefficients as MAgPIE object
 #' @author Debbora Leip

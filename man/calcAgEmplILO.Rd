@@ -8,7 +8,7 @@ calcAgEmplILO(
   subsectors = TRUE,
   inclFish = FALSE,
   inclForest = FALSE,
-  dataVersion = "July23"
+  dataVersionILO = "July23"
 )
 }
 \arguments{
@@ -20,7 +20,7 @@ on VoP}
 
 \item{inclForest}{boolean: should emplyoment in forestry be included?}
 
-\item{dataVersion}{which version of the ILO input data to use. "" for the oldest version and
+\item{dataVersionILO}{which version of the ILO input data to use. "" for the oldest version and
 old regression, or "monthYear" (e.g. "July23") for newer data}
 }
 \value{

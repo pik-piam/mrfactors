@@ -91,9 +91,9 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "July23
 
     # combine data
     data <- mbind(share, gdpPc, weight)
-    data <- luplot::as.ggplot(data)[, -5]
+    data <- as.data.frame(data)[, -1]
     data  <- reshape(data, idvar = c("Region", "Year"), timevar = "Data1", direction = "wide")
-    colnames(data) <- c("Region", "Year", "shareEmplAg", "GDPpcPPP", "population")
+    colnames(data) <- c("Region", "Year", "shareEmplAg", "GDPpcPPP", "pop")
 
     # using a log scale for GDP and sqrt scale for share of people working in
     # agriculture leads to a approximately linear relationship
@@ -101,7 +101,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "July23
     data$transformedshareEmplAg <- sqrt(data$shareEmplAg)
 
     # regression
-    reg       <- lm(transformedshareEmplAg ~ transformedGDPpcPPP, data = data, weights = `population`)
+    reg       <- lm(transformedshareEmplAg ~ transformedGDPpcPPP, data = data, weights = pop)
     intercept <- reg$coefficients["(Intercept)"][[1]]
     slope     <- reg$coefficients["transformed_GDPpcPPP"][[1]]
 
@@ -122,8 +122,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "July23
     ## HOURLY LABOR COSTS DATA FROM ILO
 
     # original hourly labor costs dataset (ILO data + data for India + data for China)
-    datasource <- ifelse(dataVersionILO == "", "ILO", paste("ILO", dataVersionILO, sep = "_"))
-    hourlyLaborCosts <- calcOutput("HourlyLaborCosts", dataVersionILO = dataVersionILO, datasource = datasource,
+    hourlyLaborCosts <- calcOutput("HourlyLaborCosts", datasource = "ILO", dataVersionILO = dataVersionILO,
                                   fillWithRegression = FALSE, aggregate = FALSE)
     hourlyLaborCosts[hourlyLaborCosts == 0] <- NA
 
@@ -133,7 +132,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "July23
     ## combining data
     years <- intersect(getItems(hourlyLaborCosts, dim = 2), getItems(gdpPcMER, dim = 2))
     data  <- mbind(hourlyLaborCosts[, years, ], gdpPcMER[, years, ])
-    data <- luplot::as.ggplot(data)[, -5]
+    data <- as.data.frame(data)[, -1]
     data  <- reshape(data, idvar = c("Region", "Year"), timevar = "Data1", direction = "wide")
     colnames(data) <- c("Region", "Year", "LaborCosts", "gdpPcMER")
 

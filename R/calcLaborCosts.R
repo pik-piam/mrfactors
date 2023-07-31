@@ -2,7 +2,7 @@
 #' @description calculates total labor costs in mio. US$MER05 (coverage depends on source: crop, livestock and
 #' fish production for USDA, and additionally forestry for GTAP and ILO)
 #' @param datasource data source on which the labor costs should be based. Available are ILO, USDA (which also uses data
-#' on VoP from FAO), and GTAP. 
+#' on VoP from FAO), and GTAP.
 #' @param dataVersionILO If source is ILO, the version can be chosen. "" for the oldest version, or "monthYear" (e.g.
 #' "July23") for a newer version)
 #' @param subsectors boolean: should output be aggregated or split into available subsectors (crops, livst, forestry,
@@ -22,6 +22,7 @@
 #' }
 #' @importFrom magclass setNames dimSums time_interpolate
 #' @importFrom GDPuc convertGDP
+#' @importFrom stringr str_split
 
 calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "July23", subsectors = TRUE, inclFish = FALSE,
                            inclForest = FALSE, otherLivst = TRUE, gtapVar = "NVFA", addSubsidies = FALSE) {
@@ -95,7 +96,7 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "July23", subsec
     sharesLivst <- calcOutput("FractionInputsUSDA", products = "kli", aggregate = FALSE)[, , "Labor"]
 
     # closest 5-year step before and after start of VoP data needed for interpolation of shares
-    yearsInt <- as.integer(stringr::str_split(years, "y", simplify = TRUE)[, 2])
+    yearsInt <- as.integer(str_split(years, "y", simplify = TRUE)[, 2])
     y <- intersect(paste0("y", seq(min(yearsInt) - min(yearsInt) %% 5, max(yearsInt) - max(yearsInt) %% 5 + 5, 5)),
                    getItems(sharesCrops, dim = 2))
 
