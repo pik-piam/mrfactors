@@ -28,11 +28,11 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersion = "July23", 
 
   if (isFALSE(recalculate)) {
     regCoeffs <- readSource("RegressionsILO", subtype = subtype, version = dataVersion)
-    
+
     if (subtype == "AgEmplShare") {
       description <- paste0("Regression coeffcients for sqrt(ag. empl. share) ~ log(GDP pc PPP, base = 10) ",
                           "and a empl. share threshold")
-    } elseif (subtype == "HourlyLaborCosts") {
+    } else if (subtype == "HourlyLaborCosts") {
       if (dataVersion == "") {
         description <- paste0("Regression coeffcients for hourly labor costs ~ GDP pc MER, ",
                             "and a wage threshold")
