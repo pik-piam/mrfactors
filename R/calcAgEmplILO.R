@@ -30,7 +30,7 @@ calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALS
   # calculate estimates of people employed in agriculture for missing countries
   # regression: sqrt(share s of total population that is employed in agriculture) ~ log10(GDP PPP per capita)
   # above a certain value of GDPpcPPP, the share of people employed in agriculture is kept constant
-  regCoeff <- readSource("RegressionsILO", "AgEmpl", dataVersion = dataVersion)
+  regCoeff <- readSource("RegressionsILO", "AgEmplShare", dataVersion = dataVersion)
 
   gdpPPPpc <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2005 Int$PPP", aggregate = FALSE)
 
