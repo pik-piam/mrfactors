@@ -4,7 +4,12 @@
 \alias{calcAgEmplILO}
 \title{calcAgEmplILO}
 \usage{
-calcAgEmplILO(subsectors = TRUE, inclFish = FALSE, inclForest = FALSE)
+calcAgEmplILO(
+  subsectors = TRUE,
+  inclFish = FALSE,
+  inclForest = FALSE,
+  dataVersion = "July23"
+)
 }
 \arguments{
 \item{subsectors}{boolean: should overall values be split into the sub-sectors agriculture, forestry and fishery
@@ -14,6 +19,9 @@ on VoP}
 \item{inclFish}{boolean: should employment in fisheries be included?}
 
 \item{inclForest}{boolean: should emplyoment in forestry be included?}
+
+\item{dataVersion}{which version of the ILO input data to use. "" for the oldest version and
+old regression, or "monthYear" (e.g. "July23") for newer data}
 }
 \value{
 List of magpie objects with results on country level, weight on country level, unit and description.

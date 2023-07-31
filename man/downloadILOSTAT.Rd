@@ -7,7 +7,8 @@
 downloadILOSTAT(subtype)
 }
 \arguments{
-\item{subtype}{Type of ILOSTAT data that should be downloaded}
+\item{subtype}{Type of ILOSTAT data that should be downloaded, version specified by suffic "_MonthYear" (month and
+year of download)}
 }
 \value{
 metadata entry

@@ -4,10 +4,13 @@
 \alias{calcWeeklyHoursILO}
 \title{calcWeeklyHoursILO}
 \usage{
-calcWeeklyHoursILO(projections = FALSE)
+calcWeeklyHoursILO(projections = FALSE, dataVersion = "July23")
 }
 \arguments{
 \item{projections}{boolean, should weekly hours be projected (by keeping constant) up to 2150?}
+
+\item{dataVersion}{which version of the ILO input data to use. "" for the oldest version and
+old regression, or "monthYear" (e.g. "July23") for newer data}
 }
 \value{
 List of magpie objects with results on country level, weight on country level, unit and description.

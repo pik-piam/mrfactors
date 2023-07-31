@@ -16,7 +16,8 @@ calcLaborCosts(
 }
 \arguments{
 \item{datasource}{data source on which the labor costs should be based. Available are ILO, USDA (which also uses data
-on VoP from FAO), and GTAP}
+on VoP from FAO), and GTAP. If source is ILO, the version can be chosen by adding a suffix ("" for the oldest
+version, or "monthYear" (e.g. "July23") for a newer version)}
 
 \item{subsectors}{boolean: should output be aggregated or split into available subsectors (crops, livst, forestry,
 fishery)}
