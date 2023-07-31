@@ -1,7 +1,7 @@
 #' @title calcHourlyLaborCosts
 #' @description calculates dataset of hourly labor costs per employee in agriculture
 #' @param datasource either raw data from "ILO" (agriculture+forestry+fishery) or data calculated based on total labor
-#' costs from "USDA_FAO" (crop+livestock production). If source is ILO, the version can be chosen by adding a suffix 
+#' costs from "USDA_FAO" (crop+livestock production). If source is ILO, the version can be chosen by adding a suffix
 #' ("" for the oldest version, or "monthYear" (e.g. "July23") for a newer version)
 #' @param sector should average hourly labor costs be reported ("agriculture"), or hourly labor costs specific to
 #' either "crops" or "livestock" production. For ILO only the aggregate hourly labor costs are available.
@@ -34,7 +34,7 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", sector = "agriculture"
 
   if (isFALSE(fillWithRegression)) {
     if (datasourceSplit == "ILO") { # data as reported by ILO (and CACP for India)
-      datasource <- ifelse(dataVersion == "", "HourlyLaborCostsByActivity", 
+      datasource <- ifelse(dataVersion == "", "HourlyLaborCostsByActivity",
                            paste("HourlyLaborCostsByActivity", dataVersion, sep = "_"))
       items <- c("ISIC_Rev31: A Agriculture, hunting and forestry", "ISIC_Rev31: B Fishing",
                  "ISIC_Rev4: A Agriculture; forestry and fishing")
@@ -154,19 +154,18 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", sector = "agriculture"
       hourlyCosts[, setdiff(getItems(hourlyCosts, dim = 2), paste0("y", 1900:calibYear)), ] <- 0
     }
 
-    # TODO different regression versions
-
-    # fill gaps with estimates using regression of HourlyLaborCost from ILO (US$MER05) ~ GDPpcMER
-    # common slope, but calibrated to countries by shifting intercept depending on first and last hourly
-    # labor cost value. Gaps within a timeseries are filled by interpolation
-    regCoeff <- readSource("RegressionsILO", subtype = "HourlyLaborCosts")
+    # fill gaps with estimates using regression of HourlyLaborCost from ILO (US$MER05) ~ GDPpcMER (old version) or
+    # log(HourlyLaborCosts) ~ log(GDPpcMER) wotj common slope, but calibrated to countries by shifting intercept
+    # depending on first and last hourly labor cost value. Gaps within a timeseries are filled by interpolation
+    regCoeff <- readSource("RegressionsILO", subtype = "HourlyLaborCosts", version = dataVersion)
 
     years <- getYears(hourlyCosts, as.integer = TRUE)
-    for (ctry in getItems(hourlyCosts, dim = 1)) {
-      ctryEst <- regCoeff[, , "intercept", drop = TRUE] + regCoeff[, , "slope", drop = TRUE] * gdpMERpc[ctry, , ]
-      y <- where(hourlyCosts[ctry, , ] != 0)$true$years
+
+    .fillTimeseries <- function(rawData, country, gdp) {
+      ctryEst <- regCoeff[, , "intercept", drop = TRUE] + regCoeff[, , "slope", drop = TRUE] * gdp[ctry, , ]
+      y <- where(rawData[ctry, , ] != 0)$true$years
       if (length(y) == 0) {
-        hourlyCosts[ctry, , ] <- ctryEst
+        rawData[ctry, , ] <- ctryEst
       } else {
         y <- as.integer(str_split(y, "y", simplify = TRUE)[, 2])
         yPast <- years[years < min(y)]
@@ -174,31 +173,51 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", sector = "agriculture"
         yGaps <- setdiff(years[(years >= min(y)) & (years <= max(y))], y)
 
         if (length(yGaps) > 0) {
-          hourlyCosts[ctry, sort(c(y, yGaps)), ] <- time_interpolate(dataset = hourlyCosts[ctry, y, ],
+          hourlyCrawDataosts[ctry, sort(c(y, yGaps)), ] <- time_interpolate(dataset = rawData[ctry, y, ],
                                                                  interpolated_year = yGaps,
                                                                  integrate_interpolated_years = TRUE)
         }
 
         if (length(yPast) > 0) {
-          calibPast <- hourlyCosts[ctry, min(y), ] - ctryEst[, min(y), ]
-          hourlyCosts[ctry, yPast, ] <- ctryEst[, yPast, ] + calibPast
+          calibPast <- rawData[ctry, min(y), ] - ctryEst[, min(y), ]
+          rawData[ctry, yPast, ] <- ctryEst[, yPast, ] + calibPast
         }
 
         if (length(yFuture) > 0) {
-          calibFuture <- hourlyCosts[ctry, max(y), ] - ctryEst[, max(y), ]
-          hourlyCosts[ctry, yFuture, ] <- ctryEst[, yFuture, ] + calibFuture
+          calibFuture <- rawData[ctry, max(y), ] - ctryEst[, max(y), ]
+          rawData[ctry, yFuture, ] <- ctryEst[, yFuture, ] + calibFuture
         }
       }
+      return(rawData)
     }
 
-    hourlyCosts[hourlyCosts < regCoeff[, , "threshold"]] <- regCoeff[, , "threshold"]
+    if (dataVersion == "") {
+      rawData <- hourlyCosts
+      gdp <- gdpMERpc
+    } else {
+      rawData <- log(hourlyCosts)
+      gdp <- log(gdpMERpc)
+    }
+
+    for (ctry in getItems(rawData, dim = 1)) {
+      rawData <- .fillTimeseries(rawData = rawData, country = ctry, gdp = gdp)
+    }
+
+    if (dataVersion == "") {
+      hourlyCosts <- rawData
+    } else {
+      hourlyCosts <- exp(rawData)
+    }
+
+    if (dataVersion == "") hourlyCosts[hourlyCosts < regCoeff[, , "threshold"]] <- regCoeff[, , "threshold"]
   }
 
   hourlyCosts <- setNames(hourlyCosts, NULL)
 
   # total hours worked (in calibration year for consistency with MAgPIE) as weight for aggregation to world regions
-  agEmpl <- calcOutput("AgEmplILO", subsectors = TRUE, dataVersion = dataVersion, aggregate = FALSE)[, , c("Livestock", "Crops")]
-  agEmpl <- if (sector != "agriculture") agEmpl[, , str_to_title(sector)] else agEmpl <- dimSums(agEmpl, dim = 3)
+  agEmpl <- calcOutput("AgEmplILO", subsectors = TRUE, dataVersion = dataVersion, aggregate = FALSE)
+  agEmpl <- ifelse(sector != "agriculture", agEmpl[, , str_to_title(sector)],
+                                            dimSums(agEmpl[, , c("Livestock", "Crops")], dim = 3))
   weeklyHours <- calcOutput("WeeklyHoursILO", dataVersion = dataVersion, aggregate = FALSE)
   weight <- hourlyCosts
   weight[, , ] <- agEmpl[, calibYear, ] * weeklyHours[, calibYear, ]

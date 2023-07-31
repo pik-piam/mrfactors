@@ -15,7 +15,7 @@
 downloadILOSTAT <- function(subtype) {
 
   # date to separate different versions of data
-  indicator <- str_split(subtype, "_", simplify = TRUE)[1,1]
+  indicator <- str_split(subtype, "_", simplify = TRUE)[1, 1]
 
   # get indicator ID of dataset
   indicatorIDs <- c(

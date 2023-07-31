@@ -6,7 +6,7 @@
 #' on VoP
 #' @param inclFish boolean: should employment in fisheries be included?
 #' @param inclForest boolean: should emplyoment in forestry be included?
-#' @param dataVersion which version of the ILO input data to use. "" for the oldest version and 
+#' @param dataVersion which version of the ILO input data to use. "" for the oldest version and
 #' old regression, or "monthYear" (e.g. "July23") for newer data
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @importFrom stringr str_split
@@ -19,7 +19,7 @@
 calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALSE, dataVersion = "July23") {
 
   # read original employment dataset from ILO (convert from thous. to mil.)
-  dataType <- ifelse(dataVersion == "", "EmplByActivityModelled", 
+  dataType <- ifelse(dataVersion == "", "EmplByActivityModelled",
                       paste("EmplByActivityModelled", dataVersion, sep = "_"))
   iloEmpl <- readSource("ILOSTAT", dataType)[, , list("Total", "Aggregate: Agriculture"), drop = TRUE]
   iloEmpl[iloEmpl == 0] <- NA
@@ -109,7 +109,7 @@ calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALS
   # for agriculture (crop+livst), forestry and fishery; and further disaggregating crops and livestock based on VoP:
 
   # shares between agriculture, forestry, fishery based on ag. empl.
-  dataType <- ifelse(dataVersion == "", "EmplByISIC2", 
+  dataType <- ifelse(dataVersion == "", "EmplByISIC2",
                       paste("EmplByISIC2", dataVersion, sep = "_"))
   agEmplISIC2 <- readSource("ILOSTAT", dataType)[, , "Total", drop = TRUE]
 

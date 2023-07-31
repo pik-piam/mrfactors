@@ -2,7 +2,7 @@
 #' @description calculates complete dataset of mean weekly hours worked by people employed in agriculture, forestry and
 #' fishery based on ILO dataset
 #' @param projections boolean, should weekly hours be projected (by keeping constant) up to 2150?
-#' @param dataVersion which version of the ILO input data to use. "" for the oldest version and 
+#' @param dataVersion which version of the ILO input data to use. "" for the oldest version and
 #' old regression, or "monthYear" (e.g. "July23") for newer data
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @author Debbora Leip
@@ -14,7 +14,7 @@
 
 calcWeeklyHoursILO <- function(projections = FALSE, dataVersion = "July23") {
 
-  dataType <- ifelse(dataVersion == "", "WeeklyHoursByActivity", 
+  dataType <- ifelse(dataVersion == "", "WeeklyHoursByActivity",
                       paste("WeeklyHoursByActivity", dataVersion, sep = "_"))
   ilo <- readSource("ILOSTAT", dataType)[, , list("Total", "Aggregate: Agriculture"), drop = TRUE]
   ilo <- ilo[, where(ilo != 0)$true$years, ]
