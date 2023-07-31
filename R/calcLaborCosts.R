@@ -2,7 +2,8 @@
 #' @description calculates total labor costs in mio. US$MER05 (coverage depends on source: crop, livestock and
 #' fish production for USDA, and additionally forestry for GTAP and ILO)
 #' @param datasource data source on which the labor costs should be based. Available are ILO, USDA (which also uses data
-#' on VoP from FAO), and GTAP
+#' on VoP from FAO), and GTAP. If source is ILO, the version can be chosen by adding a suffix ("" for the oldest
+#' version, or "monthYear" (e.g. "July23") for a newer version)
 #' @param subsectors boolean: should output be aggregated or split into available subsectors (crops, livst, forestry,
 #' fishery)
 #' @param inclFish boolean: should fish labor costs be included?
@@ -27,20 +28,25 @@ calcLaborCosts <- function(datasource = "ILO", subsectors = TRUE, inclFish = FAL
   # get data from specified source
   if (datasource == "ILO") {
 
+    # check which version of ILO data to use
+    dataVersion <- str_split(datasource, "_")[[1]][2]
+    dataVersion <- ifelse(is.na(dataVersion), "", dataVersion)
+
     # ILO employment in agriculture (mio. people)
     iloEmpl <- calcOutput("AgEmplILO", aggregate = FALSE, subsectors = subsectors,
-                          inclFish = inclFish, inclForest = inclForest)
+                          inclFish = inclFish, inclForest = inclForest, dataVersion = dataVersion)
 
     # ILO mean weekly hours actually worked per employed person in agriculture (h)
-    iloWeeklyHours <- calcOutput("WeeklyHoursILO", aggregate = FALSE)
+    iloWeeklyHours <- calcOutput("WeeklyHoursILO", aggregate = FALSE, dataVersion = dataVersion)
 
     # subset to joint years
     years <- intersect(getItems(iloEmpl, dim = 2), getItems(iloWeeklyHours, dim = 2))
     iloEmpl <- iloEmpl[, years, ]
     iloWeeklyHours <- iloWeeklyHours[, years, ]
 
-    # ILO mean nominal hourly labor cost per employee in agriculture (US$05MER/h)
-    iloLaborCosts <- calcOutput("HourlyLaborCosts", datasource = "USDA_FAO",
+    # mean nominal hourly labor cost per employee in agriculture (US$05MER/h) based on USDA_FAO calculation
+    # and regression based on ILO raw data
+    iloLaborCosts <- calcOutput("HourlyLaborCosts", datasource = datasource,
                                 fillWithRegression = TRUE, projection = "SSP2", # scenario has no influence until 2020
                                 aggregate = FALSE)[, years, ]
 

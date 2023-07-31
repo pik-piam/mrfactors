@@ -1,7 +1,8 @@
 #' @title calcHourlyLaborCosts
 #' @description calculates dataset of hourly labor costs per employee in agriculture
 #' @param datasource either raw data from "ILO" (agriculture+forestry+fishery) or data calculated based on total labor
-#' costs from "USDA_FAO" (crop+livestock production)
+#' costs from "USDA_FAO" (crop+livestock production). If source is ILO, the version can be chosen by adding a suffix 
+#' ("" for the oldest version, or "monthYear" (e.g. "July23") for a newer version)
 #' @param sector should average hourly labor costs be reported ("agriculture"), or hourly labor costs specific to
 #' either "crops" or "livestock" production. For ILO only the aggregate hourly labor costs are available.
 #' @param fillWithRegression boolean: should missing values be filled based on a regression between ILO hourly labor
@@ -22,15 +23,22 @@
 calcHourlyLaborCosts <- function(datasource = "USDA_FAO", sector = "agriculture",  fillWithRegression = TRUE,
                                  calibYear = 2010, projection = FALSE) {
 
-  if (datasource == "ILO" && sector != "agriculture") {
+  # check whether source is ILO and if so which version
+  datasourceSplit <- str_split(datasource, "_")[[1]][1]
+  dataVersion <- str_split(datasource, "_")[[1]][2]
+  dataVersion <- ifelse(is.na(dataVersion), "", dataVersion)
+
+  if (datasourceSplit == "ILO" && sector != "agriculture") {
     stop("For ILO only average hourly labor costs in agriculture are available")
   }
 
   if (isFALSE(fillWithRegression)) {
-    if (datasource == "ILO") { # data as reported by ILO (and CACP for India)
+    if (datasourceSplit == "ILO") { # data as reported by ILO (and CACP for India)
+      datasource <- ifelse(dataVersion == "", "HourlyLaborCostsByActivity", 
+                           paste("HourlyLaborCostsByActivity", dataVersion, sep = "_"))
       items <- c("ISIC_Rev31: A Agriculture, hunting and forestry", "ISIC_Rev31: B Fishing",
                  "ISIC_Rev4: A Agriculture; forestry and fishing")
-      hourlyCosts <- readSource("ILOSTAT", "HourlyLaborCostsByActivity")[, , items]
+      hourlyCosts <- readSource("ILOSTAT", datasource)[, , items]
       hourlyCosts <- hourlyCosts[, , "US$MER2005", drop = TRUE]
 
       # aggregate within rev 3.1
@@ -146,6 +154,8 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", sector = "agriculture"
       hourlyCosts[, setdiff(getItems(hourlyCosts, dim = 2), paste0("y", 1900:calibYear)), ] <- 0
     }
 
+    # TODO different regression versions
+
     # fill gaps with estimates using regression of HourlyLaborCost from ILO (US$MER05) ~ GDPpcMER
     # common slope, but calibrated to countries by shifting intercept depending on first and last hourly
     # labor cost value. Gaps within a timeseries are filled by interpolation
@@ -187,9 +197,9 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", sector = "agriculture"
   hourlyCosts <- setNames(hourlyCosts, NULL)
 
   # total hours worked (in calibration year for consistency with MAgPIE) as weight for aggregation to world regions
-  agEmpl <- calcOutput("AgEmplILO", subsectors = TRUE, aggregate = FALSE)[, , c("Livestock", "Crops")]
+  agEmpl <- calcOutput("AgEmplILO", subsectors = TRUE, dataVersion = dataVersion, aggregate = FALSE)[, , c("Livestock", "Crops")]
   agEmpl <- if (sector != "agriculture") agEmpl[, , str_to_title(sector)] else agEmpl <- dimSums(agEmpl, dim = 3)
-  weeklyHours <- calcOutput("WeeklyHoursILO", aggregate = FALSE)
+  weeklyHours <- calcOutput("WeeklyHoursILO", dataVersion = dataVersion, aggregate = FALSE)
   weight <- hourlyCosts
   weight[, , ] <- agEmpl[, calibYear, ] * weeklyHours[, calibYear, ]
 

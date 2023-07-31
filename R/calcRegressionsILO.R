@@ -1,0 +1,194 @@
+#' @title regressionsILO
+#' @description Calculates regression coefficients used by calc functions for ILO data sets
+#'
+#' @author Debbora Leip
+#' @param subtype specifies the regression type: "AgEmplShare" for a regression between the square root of the
+#' share of people employed in agriculture (out of total population) and the log (base 10) of GDP pc PPP05. 
+#' "HourlyLaborCosts" for a regression between  mean nominal hourly labor cost per employee in
+#' agriculture and GDP pc MER05.
+#' @param dataVersion which version of the ILO input data and regression to use. "" for the oldest version and 
+#' old regression, or "monthYear" (e.g. "July23") for newer data with the new regression type
+#' @param thresholdEmplShare for a certain level of GDP pc PPP, the regresion between employment share and 
+#' GDP pc PPP will lead to a share of 0 and which will then go up again for even higher GDP pc PPP. Therefore, 
+#' the employment share is kept constant after falling to this threshold.
+#' @param thresholdWage  only relevant for old hourly labor cost regression: for low GDP pc MER, the regression between
+#' hourly labor costs and GDP pc MER can lead to unreasonably low or even negative hourly labor costs. Therefore, we set
+#' all hourly labor costs below this threshold to the threshold. 
+#' @param forceWageIntercept only relevant for old hourly labor cost regression: If TRUE, the wage threshold is also
+#' used as intercept of the regression. If FALSE, the intercept is determined by the regression
+#' @param recalculate whether regression should be read from source folder, or recalculated from scratch. Recalculation
+#' can lead to new regression coefficients if data changed, and result should always be checked.
+#' @examples
+#' \dontrun{
+#'     a <- calcOutput("RegressionsILO", subtype = "HourlyLaborCosts")s
+#' }
+
+calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersion = "July23", thresholdEmplShare = 1e-4,
+                               thresholdWage = 0.1, forceWageIntercept = TRUE, recalculate = FALSE) {
+
+  if (isFALSE(recalculate)) {
+    regCoeffs <- readSource("RegressionsILO", subtype = subtype, version = dataVersion)
+    
+    if (subtype == "AgEmplShare") {
+      description <- paste0("Regression coeffcients for sqrt(ag. empl. share) ~ log(GDP pc PPP, base = 10) ",
+                          "and a empl. share threshold")
+    } elseif (subtype == "HourlyLaborCosts") {
+      if (dataVersion == "") {
+        description <- paste0("Regression coeffcients for hourly labor costs ~ GDP pc MER, ",
+                            "and a wage threshold")
+      } else {
+        description <- "Regression coeffcients of pooled OLS for log(hourly labor costs) ~ log(GDP pc MER)"
+      }
+    }
+
+    return(list(x = regCoeffs,
+                weight = NULL,
+                unit = "",
+                description = description))    
+  }
+
+  if (subtype == "AgEmplShare") {# Regression to fill missing countries in ILO ag. employment data set
+
+    if (thresholdEmplShare != 1e-4) warning(paste0("You changed the employment share threshold. This option ",
+                                             "was included for testing purposes. Might lead to inconsistencies ",
+                                             "with functions using the default regression (e.g. calcLaborCosts, ",
+                                             "calcWeeklyHours or validation functions)"))
+
+    cat(paste0("Note: In case underlying data changed (agricultural employment from ILO, historic population,", 
+                " or GDP pc PPP) you should double check the resulting regression."))
+    description <- paste0("Regression coeffcients for sqrt(ag. empl. share) ~ log(GDP pc PPP, base = 10) ",
+                        "and a empl. share threshold")
+
+    # read original employment dataset from ILO (convert from thous. to mil.)
+    dataType <- ifelse(dataVersion == "", "EmplByActivityModelled", 
+                       paste("EmplByActivityModelled", dataVersion, sep = "_"))
+    iloEmpl <- readSource("ILOSTAT", dataType)[,, "Aggregate: Agriculture"] / 1000
+    getNames(iloEmpl, dim = 2) <- "Agriculture, forestry and fishing"
+
+    # set missing values to NA
+    iloEmpl[iloEmpl == 0] <- NA
+
+    # calculate share of people employed in agriculture
+    pop <- calcOutput("PopulationPast", aggregate = FALSE) # million people
+    pop <- pop[,intersect(getYears(pop), getYears(iloEmpl)),]
+    share <- iloEmpl[,getYears(pop),"Total", drop = TRUE]/pop[,,,drop = TRUE]
+    getNames(share) <- "share_empl_ag"
+
+    # GDP per capita as independent variable (sqrt(share of people in ag.) ~ log_10(GDPpcPPP))
+    gdp_pc <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2005 Int$PPP", aggregate = FALSE)
+
+    years <- intersect(getYears(share), getYears(gdp_pc))
+    gdp_pc <- gdp_pc[, years, ]
+    share <- share[, years, ]
+
+    getSets(gdp_pc) <- c("region", "year", "data")
+    getNames(gdp_pc) <- "GDP_PPP_pc"
+
+    # regression weighted with population (as countries with high population have an higher impact on the overall
+    # employment number)
+    weight <- pop/dimSums(pop, dim = 1)
+
+    # combine data
+    data <- mbind(share, gdp_pc, weight)
+    data <- luplot::as.ggplot(data)[,-5]
+    data  <- reshape(data, idvar = c("Region", "Year"), timevar = "Data1", direction = "wide")
+    colnames(data) <- c("Region", "Year", "shareEmplAg", "GDPpcPPP", "population")
+
+    # using a log scale for GDP and sqrt scale for share of people working in
+    # agriculture leads to a approximately linear relationship
+    data$transformed_GDPpcPPP    <- log(data$GDPpcPPP, base = 10)
+    data$transformed_shareEmplAg <- sqrt(data$shareEmplAg)
+
+    # regression
+    reg       <- lm(transformed_shareEmplAg~transformed_GDPpcPPP, data = data, weights = population)
+    intercept <- reg$coefficients["(Intercept)"][[1]]
+    slope     <- reg$coefficients["transformed_GDPpcPPP"][[1]]
+
+    # for very high GDP, this regression leads to a increasing share of people employed in agriculture -> we keep
+    # the share constant after a certain threshold.
+    # We calculated the default threshold as half of the lowest observed share (empl. data version from Aug 21)
+    thresholdEmplShare <- 0.5 * min(share, na.rm = TRUE)
+    thresholdGDP <- 10 ** ((sqrt(thresholdEmplShare) - intercept) / slope)
+
+    # combine coefficients in MAgPIE object
+    regCoeffs <- new.magpie(names = c("intercept", "slope", "threshold"))
+    regCoeffs[, , "intercept"] <- intercept
+    regCoeffs[, , "slope"] <- slope
+    regCoeffs[, , "threshold"] <- thresholdGDP
+
+  } else if (subtype == "HourlyLaborCosts") {
+
+    ## HOURLY LABOR COSTS DATA FROM ILO
+
+    # original hourly labor costs dataset (ILO data + data for India + data for China)
+    datasource <- ifelse(dataVersion == "", "ILO", paste("ILO", dataVersion, sep = "_"))
+    hourlyLaborCosts <- calcOutput("HourlyLaborCosts", datasource = datasource,
+                                  fillWithRegression = FALSE, aggregate = FALSE)
+    hourlyLaborCosts[hourlyLaborCosts == 0] <- NA
+
+    ## GDP PER CAPITA IN US$MER AS DEPENDENT VARIABLE
+    GDPpcMER <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2005 US$MER", aggregate = FALSE)
+
+    ## combining data
+    years <- intersect(getItems(hourlyLaborCosts, dim = 2), getItems(GDPpcMER, dim = 2))
+    data  <- mbind(hourlyLaborCosts[, years, ], GDPpcMER[, years, ])
+    data <- luplot::as.ggplot(data)[, -5]
+    data  <- reshape(data, idvar = c("Region", "Year"), timevar = "Data1", direction = "wide")
+    colnames(data) <- c("Region", "Year", "LaborCosts", "GDPpcMER")
+
+    if (dataVersion == "") {
+      if (thresholdWage != 0.1) warning(paste0("You changed the wage threshold. This option was included ",
+                                              "for testing purposes. Might lead to inconsistencies with ",
+                                              "functions using the default regression (e.g. calcLaborCosts ",
+                                              "or calcValidHourlyLaborCosts)"))
+
+      if (isFALSE(forceWageIntercept)) warning(paste0("You changed the wage intercept setting. This option was ",
+                                              "included for testing purposes. Might lead to inconsistencies with ",
+                                              "functions using the default regression (e.g. calcLaborCosts ",
+                                              "or calcValidHourlyLaborCosts)"))
+
+      cat(paste0("Note: In case underlying data changed (hourly labor costs from ILO, ", 
+                  "or GDP pc MER) you should double check the resulting regression."))
+      description <- paste0("Regression coeffcients for hourly labor costs ~ GDP pc MER, ",
+                          "and a wage threshold")
+
+      # calculate regression (no regression weight, as we only have few countries and India would get too much influence)
+      if (isTRUE(forceWageIntercept)) {
+        reg <- lm(I(LaborCosts - thresholdWage) ~ 0 + GDPpcMER, data = data)
+        intercept <- thresholdWage
+      } else {
+        reg <- lm(LaborCosts ~ GDPpcMER, data = data)
+        intercept <- reg$coefficients["(Intercept)"]
+      } 
+
+      slope <- reg$coefficients["GDPpcMER"]
+
+      # create magclass object
+      regCoeffs <- new.magpie(cells_and_regions = "GLO", names = c("intercept", "slope", "threshold"),
+                                            fill = NA, sets = c("region", "year", "data"))
+      regCoeffs[, , "slope"] <- slope
+      regCoeffs[, , "intercept"] <- intercept
+      regCoeffs[, , "threshold"] <- thresholdWage
+    } else {
+      description <- "Regression coeffcients of pooled OLS for log(hourly labor costs) ~ log(GDP pc MER)"
+      cat(paste0("Note: In case underlying data changed (hourly labor costs from ILO, ", 
+                  "or GDP pc MER) you should double check the resulting regression."))
+
+      reg <- lm(log(LaborCosts) ~ log(GDPpcMER), data = data)
+      intercept <- reg$coefficients["(Intercept)"]
+      slope <- reg$coefficients["log(GDPpcMER)"]
+
+      # create magclass object
+      regCoeffs <- new.magpie(cells_and_regions = "GLO", names = c("intercept", "slope"),
+                                            fill = NA, sets = c("region", "year", "data"))
+      regCoeffs[, , "slope"] <- slope
+      regCoeffs[, , "intercept"] <- intercept
+    }
+  }
+
+  return(list(x = regCoeffs,
+              weight = NULL,
+              unit = "",
+              description = description))
+}
+

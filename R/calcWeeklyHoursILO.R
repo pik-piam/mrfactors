@@ -2,6 +2,8 @@
 #' @description calculates complete dataset of mean weekly hours worked by people employed in agriculture, forestry and
 #' fishery based on ILO dataset
 #' @param projections boolean, should weekly hours be projected (by keeping constant) up to 2150?
+#' @param dataVersion which version of the ILO input data to use. "" for the oldest version and 
+#' old regression, or "monthYear" (e.g. "July23") for newer data
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @author Debbora Leip
 #' @examples
@@ -10,9 +12,11 @@
 #' }
 #' @importFrom magclass getNames<- getYears getRegions where time_interpolate dimSums
 
-calcWeeklyHoursILO <- function(projections = FALSE) {
+calcWeeklyHoursILO <- function(projections = FALSE, dataVersion = "July23") {
 
-  ilo <- readSource("ILOSTAT", "WeeklyHoursByActivity")[, , list("Total", "Aggregate: Agriculture"), drop = TRUE]
+  dataType <- ifelse(dataVersion == "", "WeeklyHoursByActivity", 
+                      paste("WeeklyHoursByActivity", dataVersion, sep = "_"))
+  ilo <- readSource("ILOSTAT", dataType)[, , list("Total", "Aggregate: Agriculture"), drop = TRUE]
   ilo <- ilo[, where(ilo != 0)$true$years, ]
   ilo[ilo == 0] <- NA
 
@@ -51,7 +55,7 @@ calcWeeklyHoursILO <- function(projections = FALSE) {
   }
 
   # agricultural employment as weight (keep weight in missing years constant)
-  agEmpl <- calcOutput("AgEmplILO", aggregate = FALSE, subsectors = FALSE)
+  agEmpl <- calcOutput("AgEmplILO", aggregate = FALSE, subsectors = FALSE, dataVersion = dataVersion)
   agEmpl <- time_interpolate(agEmpl, interpolated_year = setdiff(getItems(ilo, dim = 2), getItems(agEmpl, dim = 2)),
                              integrate_interpolated_years = TRUE, extrapolation_type = "constant")
 
