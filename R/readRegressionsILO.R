@@ -24,7 +24,7 @@ readRegressionsILO <- function(subtype = "AgEmplShare") {
 
   # valid version?
   if (!file.exists(paste0(subtype, ".csv"))) {
-    stop("This version of the regression has not been added to the source folder yet.")
+    stop(paste0("This version of the regression (", subtype, ") has not been added to the source folder yet."))
   }
 
   # return regression coefficients

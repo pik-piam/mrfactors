@@ -213,8 +213,11 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "July
 
   # total hours worked (in calibration year for consistency with MAgPIE) as weight for aggregation to world regions
   agEmpl <- calcOutput("AgEmplILO", subsectors = TRUE, dataVersionILO = dataVersionILO, aggregate = FALSE)
-  agEmpl <- ifelse(sector != "agriculture", agEmpl[, , str_to_title(sector)],
-                                            dimSums(agEmpl[, , c("Livestock", "Crops")], dim = 3))
+  if (sector == "agriculture") {
+    agEmpl <- dimSums(agEmpl[, , c("Livestock", "Crops")], dim = 3)
+  } else {
+    agEmpl <- agEmpl[, , str_to_title(sector)]
+  }
   weeklyHours <- calcOutput("WeeklyHoursILO", dataVersionILO = dataVersionILO, aggregate = FALSE)
   weight <- hourlyCosts
   weight[, , ] <- agEmpl[, calibYear, ] * weeklyHours[, calibYear, ]
