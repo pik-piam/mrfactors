@@ -194,6 +194,7 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "July
       gdp <- gdpMERpc
     } else {
       rawData <- log(hourlyCosts)
+      rawData[!is.finite(rawData)] <- 0
       gdp <- log(gdpMERpc)
     }
 
