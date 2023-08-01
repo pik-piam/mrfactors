@@ -171,7 +171,7 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "July
         yGaps <- setdiff(years[(years >= min(y)) & (years <= max(y))], y)
 
         if (length(yGaps) > 0) {
-          hourlyCrawDataosts[ctry, sort(c(y, yGaps)), ] <- time_interpolate(dataset = rawData[ctry, y, ],
+          rawData[ctry, sort(c(y, yGaps)), ] <- time_interpolate(dataset = rawData[ctry, y, ],
                                                                  interpolated_year = yGaps,
                                                                  integrate_interpolated_years = TRUE)
         }
