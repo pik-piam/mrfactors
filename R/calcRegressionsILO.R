@@ -8,9 +8,6 @@
 #' agriculture and GDP pc MER05.
 #' @param dataVersionILO which version of the ILO input data and regression to use. "" for the oldest version and
 #' old regression, or "monthYear" (e.g. "July23") for newer data with the new regression type
-#' @param thresholdEmplShare for a certain level of GDP pc PPP, the regresion between employment share and
-#' GDP pc PPP will lead to a share of 0 and which will then go up again for even higher GDP pc PPP. Therefore,
-#' the employment share is kept constant after falling to this threshold.
 #' @param thresholdWage  only relevant for old hourly labor cost regression: for low GDP pc MER, the regression between
 #' hourly labor costs and GDP pc MER can lead to unreasonably low or even negative hourly labor costs. Therefore, we set
 #' all hourly labor costs below this threshold to the threshold.
@@ -23,7 +20,7 @@
 #'     a <- calcOutput("RegressionsILO", subtype = "HourlyLaborCosts")
 #' }
 
-calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "July23", thresholdEmplShare = 1e-4,
+calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "July23",
                                thresholdWage = 0.1, forceWageIntercept = TRUE, recalculate = FALSE) {
 
   if (isFALSE(recalculate)) {
@@ -49,11 +46,6 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "July23
   }
 
   if (subtype == "AgEmplShare") {# Regression to fill missing countries in ILO ag. employment data set
-
-    if (thresholdEmplShare != 1e-4) warning(paste0("You changed the employment share threshold. This option ",
-                                             "was included for testing purposes. Might lead to inconsistencies ",
-                                             "with functions using the default regression (e.g. calcLaborCosts, ",
-                                             "calcWeeklyHours or validation functions)"))
 
     cat(paste0("Note: In case underlying data changed (agricultural employment from ILO, historic population,",
                 " or GDP pc PPP) you should double check the resulting regression."))
@@ -103,7 +95,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "July23
     # regression
     reg       <- lm(transformedshareEmplAg ~ transformedGDPpcPPP, data = data, weights = pop)
     intercept <- reg$coefficients["(Intercept)"][[1]]
-    slope     <- reg$coefficients["transformed_GDPpcPPP"][[1]]
+    slope     <- reg$coefficients["transformedGDPpcPPP"][[1]]
 
     # for very high GDP, this regression leads to a increasing share of people employed in agriculture -> we keep
     # the share constant after a certain threshold.
