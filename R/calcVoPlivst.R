@@ -44,7 +44,7 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE) {
     pricesRegional <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO",
                                              aggregate = TRUE, regionmapping = "regionmappingH12.csv"))
     pricesRegional <- toolAggregate(pricesRegional, rel = toolGetMapping("regionmappingH12.csv",
-                                    where = "mappingfolder"),
+                                    where = "mappingfolder", type = "regional"),
                                     from = "RegionCode", to = "CountryCode")
     prices[prices == 0] <- pricesRegional[prices == 0]
 
