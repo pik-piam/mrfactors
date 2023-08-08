@@ -12,7 +12,7 @@
 #' }
 #' @importFrom magclass getNames<- getYears getRegions where time_interpolate dimSums
 
-calcWeeklyHoursILO <- function(projections = FALSE, dataVersionILO = "July23") {
+calcWeeklyHoursILO <- function(projections = FALSE, dataVersionILO = "Aug23") {
 
   dataType <- ifelse(dataVersionILO == "", "WeeklyHoursByActivity",
                       paste("WeeklyHoursByActivity", dataVersionILO, sep = "_"))

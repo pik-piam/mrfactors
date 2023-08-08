@@ -20,7 +20,7 @@
 #'     a <- calcOutput("RegressionsILO", subtype = "HourlyLaborCosts")
 #' }
 
-calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "July23",
+calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug23",
                                thresholdWage = 0.1, forceWageIntercept = TRUE, recalculate = FALSE) {
 
   if (isFALSE(recalculate)) {

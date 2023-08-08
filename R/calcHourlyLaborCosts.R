@@ -21,7 +21,7 @@
 #' @importFrom stringr str_split str_to_title
 
 
-calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "July23", sector = "agriculture",
+calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug23", sector = "agriculture",
                                  fillWithRegression = TRUE, calibYear = 2010, projection = FALSE) {
 
   if (datasource == "ILO" && sector != "agriculture") {

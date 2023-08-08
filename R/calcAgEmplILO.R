@@ -16,7 +16,7 @@
 #' calcOutput("AgEmplILO")
 #' }
 
-calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALSE, dataVersionILO = "July23") {
+calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALSE, dataVersionILO = "Aug23") {
 
   # read original employment dataset from ILO (convert from thous. to mil.)
   dataType <- ifelse(dataVersionILO == "", "EmplByActivityModelled",

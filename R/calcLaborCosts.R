@@ -24,7 +24,7 @@
 #' @importFrom GDPuc convertGDP
 #' @importFrom stringr str_split
 
-calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "July23", subsectors = TRUE, inclFish = FALSE,
+calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsectors = TRUE, inclFish = FALSE,
                            inclForest = FALSE, otherLivst = TRUE, gtapVar = "NVFA", addSubsidies = FALSE) {
 
   # get data from specified source
