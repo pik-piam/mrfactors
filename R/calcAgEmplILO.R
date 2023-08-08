@@ -7,7 +7,7 @@
 #' @param inclFish boolean: should employment in fisheries be included?
 #' @param inclForest boolean: should emplyoment in forestry be included?
 #' @param dataVersionILO which version of the ILO input data to use. "" for the oldest version and
-#' old regression, or "monthYear" (e.g. "July23") for newer data
+#' old regression, or "monthYear" (e.g. "Aug23") for newer data
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @importFrom stringr str_split
 #' @author Debbora Leip

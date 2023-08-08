@@ -7,7 +7,7 @@
 #' "HourlyLaborCosts" for a regression between  mean nominal hourly labor cost per employee in
 #' agriculture and GDP pc MER05.
 #' @param dataVersionILO which version of the ILO input data and regression to use. "" for the oldest version and
-#' old regression, or "monthYear" (e.g. "July23") for newer data with the new regression type
+#' old regression, or "monthYear" (e.g. "Aug23") for newer data with the new regression type
 #' @param thresholdWage  only relevant for old hourly labor cost regression: for low GDP pc MER, the regression between
 #' hourly labor costs and GDP pc MER can lead to unreasonably low or even negative hourly labor costs. Therefore, we set
 #' all hourly labor costs below this threshold to the threshold.

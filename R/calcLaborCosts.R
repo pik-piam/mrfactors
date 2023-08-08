@@ -4,7 +4,7 @@
 #' @param datasource data source on which the labor costs should be based. Available are ILO, USDA (which also uses data
 #' on VoP from FAO), and GTAP.
 #' @param dataVersionILO If source is ILO, the version can be chosen. "" for the oldest version, or "monthYear" (e.g.
-#' "July23") for a newer version)
+#' "Aug23") for a newer version)
 #' @param subsectors boolean: should output be aggregated or split into available subsectors (crops, livst, forestry,
 #' fishery)
 #' @param inclFish boolean: should fish labor costs be included?
