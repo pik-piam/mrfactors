@@ -6,8 +6,7 @@
 \usage{
 calcRegressionsILO(
   subtype = "AgEmplShare",
-  dataVersionILO = "July23",
-  thresholdEmplShare = 1e-04,
+  dataVersionILO = "Aug23",
   thresholdWage = 0.1,
   forceWageIntercept = TRUE,
   recalculate = FALSE
@@ -20,11 +19,7 @@ share of people employed in agriculture (out of total population) and the log (b
 agriculture and GDP pc MER05.}
 
 \item{dataVersionILO}{which version of the ILO input data and regression to use. "" for the oldest version and
-old regression, or "monthYear" (e.g. "July23") for newer data with the new regression type}
-
-\item{thresholdEmplShare}{for a certain level of GDP pc PPP, the regresion between employment share and
-GDP pc PPP will lead to a share of 0 and which will then go up again for even higher GDP pc PPP. Therefore,
-the employment share is kept constant after falling to this threshold.}
+old regression, or "monthYear" (e.g. "Aug23") for newer data with the new regression type}
 
 \item{thresholdWage}{only relevant for old hourly labor cost regression: for low GDP pc MER, the regression between
 hourly labor costs and GDP pc MER can lead to unreasonably low or even negative hourly labor costs. Therefore, we set

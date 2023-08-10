@@ -8,7 +8,7 @@ calcAgEmplILO(
   subsectors = TRUE,
   inclFish = FALSE,
   inclForest = FALSE,
-  dataVersionILO = "July23"
+  dataVersionILO = "Aug23"
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ on VoP}
 \item{inclForest}{boolean: should emplyoment in forestry be included?}
 
 \item{dataVersionILO}{which version of the ILO input data to use. "" for the oldest version and
-old regression, or "monthYear" (e.g. "July23") for newer data}
+old regression, or "monthYear" (e.g. "Aug23") for newer data}
 }
 \value{
 List of magpie objects with results on country level, weight on country level, unit and description.

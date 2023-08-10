@@ -14,7 +14,7 @@ readRegressionsILO(subtype = "AgEmplShare")
 log(hourly labor costs) ~ log(GDP pc MER) (new version)
 }
 The version of regression and underlying data can be chosen by adding a suffix to the subtype, "" for the oldest
-version, or "_monthYear" (e.g. "_July23") for newer version}
+version, or "_monthYear" (e.g. "_Aug23") for newer version}
 }
 \value{
 regression coefficients as MAgPIE object
