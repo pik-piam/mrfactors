@@ -177,12 +177,12 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
         }
 
         if (length(yPast) > 0) {
-          calibPast <- rawData[ctry, min(y), ] - ctryEst[, min(y), ]
+          calibPast <- round(rawData[ctry, min(y), ], 4) - ctryEst[, min(y), ]
           rawData[ctry, yPast, ] <- ctryEst[, yPast, ] + calibPast
         }
 
         if (length(yFuture) > 0) {
-          calibFuture <- rawData[ctry, max(y), ] - ctryEst[, max(y), ]
+          calibFuture <- round(rawData[ctry, max(y), ], 4) - ctryEst[, max(y), ]
           rawData[ctry, yFuture, ] <- ctryEst[, yFuture, ] + calibFuture
         }
       }
