@@ -10,6 +10,9 @@
 #' costs and GDPpcMER (calibrated to countries)
 #' @param calibYear in case of fillWithRegression being TRUE, data after this year will be ignored and calculated using
 #' the regression (calibrated for each year to calibYear, or the most recent year with data before calibYear)
+#' @param cutAfterCalibYear boolean, only relevant if fillWithRegression is TRUE. If cutAfterCalibYear is TRUE, raw
+#' data after the calib year is overwritten by regression results (necessary for consistency with calculation within
+#' MAgPIE). If FALSE, raw data is kept and only gaps are filled with regression
 #' @param projection either FALSE or SSP on which projections should be based. Only relevant if fillWithRegression is
 #' TRUE.
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
@@ -22,7 +25,8 @@
 
 
 calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug23", sector = "agriculture",
-                                 fillWithRegression = TRUE, calibYear = 2010, projection = FALSE) {
+                                 fillWithRegression = TRUE, calibYear = 2010, cutAfterCalibYear = TRUE,
+                                 projection = FALSE) {
 
   if (datasource == "ILO" && sector != "agriculture") {
     stop("For ILO only average hourly labor costs in agriculture are available")
@@ -147,9 +151,8 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
 
     # set years after calibYear to 0 (as in MAgPIE we calibrate to last year of the set t_past, we need to remove data
     # for later years here as well if results should be the same)
-    if (datasource == "USDA_FAO") {
-      hourlyCosts[, setdiff(getItems(hourlyCosts, dim = 2), paste0("y", 1900:calibYear)), ] <- 0
-    }
+    afterCalib <- hourlyCosts[, setdiff(getItems(hourlyCosts, dim = 2), paste0("y", 1900:calibYear)), ]
+    hourlyCosts[, setdiff(getItems(hourlyCosts, dim = 2), paste0("y", 1900:calibYear)), ] <- 0
 
     # fill gaps with estimates using regression of HourlyLaborCost from ILO (US$MER05) ~ GDPpcMER (old version) or
     # log(HourlyLaborCosts) ~ log(GDPpcMER) wotj common slope, but calibrated to countries by shifting intercept
@@ -177,12 +180,12 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
         }
 
         if (length(yPast) > 0) {
-          calibPast <- round(rawData[ctry, min(y), ], 4) - ctryEst[, min(y), ]
+          calibPast <- rawData[ctry, min(y), ] - ctryEst[, min(y), ]
           rawData[ctry, yPast, ] <- ctryEst[, yPast, ] + calibPast
         }
 
         if (length(yFuture) > 0) {
-          calibFuture <- round(rawData[ctry, max(y), ], 4) - ctryEst[, max(y), ]
+          calibFuture <- rawData[ctry, max(y), ] - ctryEst[, max(y), ]
           rawData[ctry, yFuture, ] <- ctryEst[, yFuture, ] + calibFuture
         }
       }
@@ -207,6 +210,10 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
       hourlyCosts[hourlyCosts < regCoeff[, , "threshold"]] <- regCoeff[, , "threshold"]
     } else {
       hourlyCosts <- exp(rawData)
+    }
+
+    if (isFALSE(cutAfterCalibYear)) {
+      hourlyCosts[, getYears(afterCalib), ][afterCalib != 0] <- afterCalib[afterCalib != 0]
     }
   }
 

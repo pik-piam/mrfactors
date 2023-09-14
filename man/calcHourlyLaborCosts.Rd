@@ -10,6 +10,7 @@ calcHourlyLaborCosts(
   sector = "agriculture",
   fillWithRegression = TRUE,
   calibYear = 2010,
+  cutAfterCalibYear = TRUE,
   projection = FALSE
 )
 }
@@ -28,6 +29,10 @@ costs and GDPpcMER (calibrated to countries)}
 
 \item{calibYear}{in case of fillWithRegression being TRUE, data after this year will be ignored and calculated using
 the regression (calibrated for each year to calibYear, or the most recent year with data before calibYear)}
+
+\item{cutAfterCalibYear}{boolean, only relevant if fillWithRegression is TRUE. If cutAfterCalibYear is TRUE, raw
+data after the calib year is overwritten by regression results (necessary for consistency with calculation within
+MAgPIE). If FALSE, raw data is kept and only gaps are filled with regression}
 
 \item{projection}{either FALSE or SSP on which projections should be based. Only relevant if fillWithRegression is
 TRUE.}
