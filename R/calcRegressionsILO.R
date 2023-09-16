@@ -8,11 +8,14 @@
 #' agriculture and GDP pc MER05.
 #' @param dataVersionILO which version of the ILO input data and regression to use. "" for the oldest version and
 #' old regression, or "monthYear" (e.g. "Aug23") for newer data with the new regression type
-#' @param thresholdWage  only relevant for old hourly labor cost regression: for low GDP pc MER, the regression between
-#' hourly labor costs and GDP pc MER can lead to unreasonably low or even negative hourly labor costs. Therefore, we set
-#' all hourly labor costs below this threshold to the threshold.
-#' @param forceWageIntercept only relevant for old hourly labor cost regression: If TRUE, the wage threshold is also
+#' @param thresholdWage  only relevant for linear hourly labor cost regression: for low GDP pc MER, the regression
+#' between hourly labor costs and GDP pc MER can lead to unreasonably low or even negative hourly labor costs.
+#' Therefore, we set all hourly labor costs below this threshold to the threshold.
+#' @param forceWageIntercept only relevant for linear hourly labor cost regression: If TRUE, the wage threshold is also
 #' used as intercept of the regression. If FALSE, the intercept is determined by the regression
+#' @param wageRegrType Only relevant for HourlyLaborCosts regression. If NULL, a linear regression will be used for the
+#' oldest data (dataVersionILO: ""), and a loglog regression for all newer data. Can be overwritten by specifically
+#' setting wageRegrType to "linear" or "loglog".
 #' @param recalculate whether regression should be read from source folder, or recalculated from scratch. Recalculation
 #' can lead to new regression coefficients if data changed, and result should always be checked.
 #' @examples
@@ -21,7 +24,8 @@
 #' }
 
 calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug23",
-                               thresholdWage = 0.1, forceWageIntercept = TRUE, recalculate = FALSE) {
+                               thresholdWage = 0.1, forceWageIntercept = TRUE,
+                               wageRegrType = NULL, recalculate = FALSE) {
 
   if (isFALSE(recalculate)) {
     subtypeVersion <- ifelse(dataVersionILO == "", subtype, paste(subtype, dataVersionILO, sep = "_"))
@@ -128,7 +132,17 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug23"
     data  <- reshape(data, idvar = c("Region", "Year"), timevar = "Data1", direction = "wide")
     colnames(data) <- c("Region", "Year", "LaborCosts", "gdpPcMER")
 
-    if (dataVersionILO == "") {
+    if (is.null(wageRegrType)) {
+      wageRegrType <- ifelse(dataVersionILO == "", "linear",  "loglog")
+    } else {
+      warning(paste0("You manually set the regression type of the hourly labor cost ",
+                     "regression to ", wageRegrType, ". This option was included for ",
+                     "testing purposes. In general, the linear regression should be ",
+                     "only used for the oldest data version, and the log-log regression ",
+                     "in all newer cases."))
+    }
+
+    if (wageRegrType == "linear") {
       if (thresholdWage != 0.1) warning(paste0("You changed the wage threshold. This option was included ",
                                               "for testing purposes. Might lead to inconsistencies with ",
                                               "functions using the default regression (e.g. calcLaborCosts ",
