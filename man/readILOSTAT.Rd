@@ -7,7 +7,8 @@
 readILOSTAT(subtype)
 }
 \arguments{
-\item{subtype}{Type of ILOSTAT data that should be read
+\item{subtype}{Type of ILOSTAT data that should be downloaded, version specified by suffic "_MonthYear" (month and
+year of download)
 \itemize{
 \item `EmplByActivityModelled`: "Employment by sex and economic activity -- ILO modelled estimates,
 Nov. 2020 (thousands)"

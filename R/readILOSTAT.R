@@ -1,7 +1,8 @@
 #' @title readILOSTAT
 #' @description Read in ILOSTAT data that has been downloaded from the ILOSTAT website
 #'
-#' @param subtype Type of ILOSTAT data that should be read
+#' @param subtype Type of ILOSTAT data that should be downloaded, version specified by suffic "_MonthYear" (month and
+#' year of download)
 #' \itemize{
 #' \item `EmplByActivityModelled`: "Employment by sex and economic activity -- ILO modelled estimates,
 #' Nov. 2020 (thousands)"
@@ -38,6 +39,9 @@
 
 readILOSTAT <- function(subtype) {
 
+  # date to separate different versions of data
+  indicator <- str_split(subtype, "_", simplify = TRUE)[1, 1]
+
   # get indicator ID of dataset
   indicatorIDs <- c(
     EmplByActivityModelled       = "EMP_2EMP_SEX_ECO_NB_A",
@@ -53,7 +57,7 @@ readILOSTAT <- function(subtype) {
     LaborIncomeShareGDPModelled  = "LAP_2GDP_NOC_RT_A",
     OutputPerWorkerModelled      = "GDP_205U_NOC_NB_A"
   )
-  indicatorID <- toolSubtypeSelect(subtype, indicatorIDs)
+  indicatorID <- toolSubtypeSelect(indicator, indicatorIDs)
 
   # read data
   ilo <- read.table(paste0(indicatorID, ".csv"), header = TRUE)

@@ -1,6 +1,7 @@
 #' @title downloadILOSTAT
 #' @description Download data from ILOSTAT
-#' @param subtype Type of ILOSTAT data that should be downloaded
+#' @param subtype Type of ILOSTAT data that should be downloaded, version specified by suffic "_MonthYear" (month and
+#' year of download)
 #' @return metadata entry
 #' @author Debbora Leip
 #' @examples
@@ -8,10 +9,13 @@
 #'   downloadSource("ILOSTAT", "EmplByActivityModelled")
 #' }
 #' @importFrom dplyr select all_of
-#' @importFrom stringr str_extract
+#' @importFrom stringr str_extract str_split
 #' @importFrom utils write.table
 
 downloadILOSTAT <- function(subtype) {
+
+  # date to separate different versions of data
+  indicator <- str_split(subtype, "_", simplify = TRUE)[1, 1]
 
   # get indicator ID of dataset
   indicatorIDs <- c(
@@ -28,7 +32,7 @@ downloadILOSTAT <- function(subtype) {
     LaborIncomeShareGDPModelled  = "LAP_2GDP_NOC_RT_A",
     OutputPerWorkerModelled      = "GDP_205U_NOC_NB_A"
   )
-  indicatorID <- toolSubtypeSelect(subtype, indicatorIDs)
+  indicatorID <- toolSubtypeSelect(indicator, indicatorIDs)
 
   # download and save data
   if (requireNamespace("Rilostat", quietly = TRUE)) {

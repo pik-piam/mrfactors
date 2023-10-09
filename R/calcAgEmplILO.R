@@ -6,6 +6,8 @@
 #' on VoP
 #' @param inclFish boolean: should employment in fisheries be included?
 #' @param inclForest boolean: should emplyoment in forestry be included?
+#' @param dataVersionILO which version of the ILO input data to use. "" for the oldest version and
+#' old regression, or "monthYear" (e.g. "Aug23") for newer data
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @importFrom stringr str_split
 #' @author Debbora Leip
@@ -14,9 +16,12 @@
 #' calcOutput("AgEmplILO")
 #' }
 
-calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALSE) {
+calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALSE, dataVersionILO = "Aug23") {
 
-  iloEmpl <- readSource("ILOSTAT", "EmplByActivityModelled")[, , list("Total", "Aggregate: Agriculture"), drop = TRUE]
+  # read original employment dataset from ILO (convert from thous. to mil.)
+  dataType <- ifelse(dataVersionILO == "", "EmplByActivityModelled",
+                      paste("EmplByActivityModelled", dataVersionILO, sep = "_"))
+  iloEmpl <- readSource("ILOSTAT", dataType)[, , list("Total", "Aggregate: Agriculture"), drop = TRUE]
   iloEmpl[iloEmpl == 0] <- NA
 
   # from thousands to millions
@@ -25,7 +30,8 @@ calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALS
   # calculate estimates of people employed in agriculture for missing countries
   # regression: sqrt(share s of total population that is employed in agriculture) ~ log10(GDP PPP per capita)
   # above a certain value of GDPpcPPP, the share of people employed in agriculture is kept constant
-  regCoeff <- readSource("RegressionsILO", "AgEmpl")
+  subtype <- ifelse(dataVersionILO == "", "AgEmplShare", paste("AgEmplShare", dataVersionILO, sep = "_"))
+  regCoeff <- readSource("RegressionsILO", subtype)
 
   gdpPPPpc <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2005 Int$PPP", aggregate = FALSE)
 
@@ -104,7 +110,9 @@ calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALS
   # for agriculture (crop+livst), forestry and fishery; and further disaggregating crops and livestock based on VoP:
 
   # shares between agriculture, forestry, fishery based on ag. empl.
-  agEmplISIC2 <- readSource("ILOSTAT", "EmplByISIC2")[, , "Total", drop = TRUE]
+  dataType <- ifelse(dataVersionILO == "", "EmplByISIC2",
+                      paste("EmplByISIC2", dataVersionILO, sep = "_"))
+  agEmplISIC2 <- readSource("ILOSTAT", dataType)[, , "Total", drop = TRUE]
 
   agEmpltotal <- new.magpie(cells_and_regions = getItems(agEmplISIC2, dim = 1),
                        years = getItems(agEmplISIC2, dim = 2),
