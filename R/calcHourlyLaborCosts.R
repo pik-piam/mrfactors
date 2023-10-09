@@ -9,7 +9,8 @@
 #' @param fillWithRegression boolean: should missing values be filled based on a regression between ILO hourly labor
 #' costs and GDPpcMER (calibrated to countries)
 #' @param calibYear in case of fillWithRegression being TRUE, data after this year will be ignored and calculated using
-#' the regression (calibrated for each year to calibYear, or the most recent year with data before calibYear)
+#' the regression (calibrated for each year to calibYear, or the most recent year with data before calibYear). NULL if
+#' all data should be used for calibration
 #' @param cutAfterCalibYear boolean, only relevant if fillWithRegression is TRUE. If cutAfterCalibYear is TRUE, raw
 #' data after the calib year is overwritten by regression results (necessary for consistency with calculation within
 #' MAgPIE). If FALSE, raw data is kept and only gaps are filled with regression
@@ -24,9 +25,9 @@
 #' @importFrom stringr str_split str_to_title
 
 
-calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug23", sector = "agriculture",
-                                 fillWithRegression = TRUE, calibYear = 2010, cutAfterCalibYear = TRUE,
-                                 projection = FALSE) {
+calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug23", # nolint: cyclocomp_linter
+                                 sector = "agriculture", fillWithRegression = TRUE, calibYear = 2010,
+                                 cutAfterCalibYear = TRUE, projection = FALSE) {
 
   if (datasource == "ILO" && sector != "agriculture") {
     stop("For ILO only average hourly labor costs in agriculture are available")
@@ -91,7 +92,7 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
     } else if (datasource == "USDA_FAO") { # from USDA/FAO labor costs for crop+livst, ag. empl. and weekly hours
       # ag. empl. from ILO
       agEmpl <- calcOutput("AgEmplILO", subsectors = TRUE, dataVersionILO = dataVersionILO,
-                            aggregate = FALSE)[, , c("Livestock", "Crops")]
+                           aggregate = FALSE)[, , c("Livestock", "Crops")]
 
       # total labor costs (calculated as VoP * labor cost share)
       totalLaborCosts <- calcOutput("LaborCosts", dataVersionILO = dataVersionILO, datasource = "USDA",
@@ -146,13 +147,15 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
 
     # add years with GDP data to hourlyCosts object
     hourlyCosts <- magpiesort(add_columns(hourlyCosts, dim = 2, fill = 0,
-                              addnm = setdiff(getItems(gdpMERpc, dim = 2), getItems(hourlyCosts, dim = 2))))
+                                          addnm = setdiff(getItems(gdpMERpc, dim = 2), getItems(hourlyCosts, dim = 2))))
     hourlyCosts <- hourlyCosts[, getItems(gdpMERpc, dim = 2), ]
 
     # set years after calibYear to 0 (as in MAgPIE we calibrate to last year of the set t_past, we need to remove data
     # for later years here as well if results should be the same)
-    afterCalib <- hourlyCosts[, setdiff(getItems(hourlyCosts, dim = 2), paste0("y", 1900:calibYear)), ]
-    hourlyCosts[, setdiff(getItems(hourlyCosts, dim = 2), paste0("y", 1900:calibYear)), ] <- 0
+    if (!is.null(calibYear) && (calibYear < max(getYears(hourlyCosts, as.integer = TRUE)))) {
+      afterCalib <- hourlyCosts[, setdiff(getItems(hourlyCosts, dim = 2), paste0("y", 1900:calibYear)), ]
+      hourlyCosts[, setdiff(getItems(hourlyCosts, dim = 2), paste0("y", 1900:calibYear)), ] <- 0
+    }
 
     # fill gaps with estimates using regression of HourlyLaborCost from ILO (US$MER05) ~ GDPpcMER (old version) or
     # log(HourlyLaborCosts) ~ log(GDPpcMER) wotj common slope, but calibrated to countries by shifting intercept
@@ -192,10 +195,10 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
       return(rawData)
     }
 
-    if (dataVersionILO == "") {
+    if (dataVersionILO == "") { # linear regression
       rawData <- hourlyCosts
       gdp <- gdpMERpc
-    } else {
+    } else { # log log regression
       rawData <- log(hourlyCosts)
       rawData[!is.finite(rawData)] <- 0
       gdp <- log(gdpMERpc)
@@ -205,21 +208,23 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
       rawData <- .fillTimeseries(rawData = rawData, country = ctry, gdp = gdp)
     }
 
-    if (dataVersionILO == "") {
+    if (dataVersionILO == "") { # linear regression
       hourlyCosts <- rawData
       hourlyCosts[hourlyCosts < regCoeff[, , "threshold"]] <- regCoeff[, , "threshold"]
-    } else {
+    } else { # log log regression
       hourlyCosts <- exp(rawData)
     }
 
-    if (isFALSE(cutAfterCalibYear)) {
+    # readd data from years after calibYear if cutAfterCalibYear is FALSE
+    if (isFALSE(cutAfterCalibYear) && !is.null(calibYear) &&
+          (calibYear < max(getYears(hourlyCosts, as.integer = TRUE)))) {
       hourlyCosts[, getYears(afterCalib), ][afterCalib != 0] <- afterCalib[afterCalib != 0]
     }
   }
 
   hourlyCosts <- setNames(hourlyCosts, NULL)
 
-  # total hours worked (in calibration year for consistency with MAgPIE) as weight for aggregation to world regions
+  # total hours worked as weight for aggregation to world regions
   agEmpl <- calcOutput("AgEmplILO", subsectors = TRUE, dataVersionILO = dataVersionILO, aggregate = FALSE)
   if (sector == "agriculture") {
     agEmpl <- dimSums(agEmpl[, , c("Livestock", "Crops")], dim = 3)
@@ -228,7 +233,17 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
   }
   weeklyHours <- calcOutput("WeeklyHoursILO", dataVersionILO = dataVersionILO, aggregate = FALSE)
   weight <- hourlyCosts
-  weight[, , ] <- agEmpl[, calibYear, ] * weeklyHours[, calibYear, ]
+  years <- intersect(getYears(hourlyCosts, as.integer = TRUE),
+                     intersect(getYears(agEmpl, as.integer = TRUE), getYears(weeklyHours, as.integer = TRUE)))
+  if (!is.null(calibYear) && (calibYear < max(years))) { # in calibration year for consistency with MAgPIE
+    weight[, , ] <- agEmpl[, calibYear, ] * weeklyHours[, calibYear, ]
+  } else if (!is.null(calibYear)) { # last year of data if calibration year is not available
+    weight[, , ] <- agEmpl[, max(years), ] * weeklyHours[, max(years), ]
+  } else { # actual year if no calibration year is used (last year for projections)
+    weight[, years, ] <- agEmpl[, years, ] * weeklyHours[, years, ]
+    otherYears <- setdiff(getYears(hourlyCosts, as.integer = TRUE), years)
+    weight[, otherYears, ] <- agEmpl[, max(years), ] * weeklyHours[, max(years), ]
+  }
 
   weight[hourlyCosts == 0] <- 0
 

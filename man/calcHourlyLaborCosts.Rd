@@ -28,7 +28,8 @@ either "crops" or "livestock" production. For ILO only the aggregate hourly labo
 costs and GDPpcMER (calibrated to countries)}
 
 \item{calibYear}{in case of fillWithRegression being TRUE, data after this year will be ignored and calculated using
-the regression (calibrated for each year to calibYear, or the most recent year with data before calibYear)}
+the regression (calibrated for each year to calibYear, or the most recent year with data before calibYear). NULL if
+all data should be used for calibration}
 
 \item{cutAfterCalibYear}{boolean, only relevant if fillWithRegression is TRUE. If cutAfterCalibYear is TRUE, raw
 data after the calib year is overwritten by regression results (necessary for consistency with calculation within
