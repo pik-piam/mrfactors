@@ -1,6 +1,6 @@
 # MADRaT based package on factor inputs
 
-R package **mrfactors**, version **0.3.4**
+R package **mrfactors**, version **0.3.5**
 
 [![CRAN status](https://www.r-pkg.org/badges/version/mrfactors)](https://cran.r-project.org/package=mrfactors)  [![R build status](https://github.com/pik-piam/mrfactors/workflows/check/badge.svg)](https://github.com/pik-piam/mrfactors/actions) [![codecov](https://codecov.io/gh/pik-piam/mrfactors/branch/master/graph/badge.svg)](https://app.codecov.io/gh/pik-piam/mrfactors) [![r-universe](https://pik-piam.r-universe.dev/badges/mrfactors)](https://pik-piam.r-universe.dev/builds)
 
@@ -38,7 +38,7 @@ In case of questions / problems please contact Debbora Leip <leip@pik-potsdam.de
 
 To cite package **mrfactors** in publications use:
 
-Leip D, Molina Bacca E (2023). _mrfactors: MADRaT based package on factor inputs_. R package version 0.3.4, <URL: https://github.com/pik-piam/mrfactors>.
+Leip D, Molina Bacca E (2023). _mrfactors: MADRaT based package on factor inputs_. R package version 0.3.5, <URL: https://github.com/pik-piam/mrfactors>.
 
 A BibTeX entry for LaTeX users is
 
@@ -47,7 +47,7 @@ A BibTeX entry for LaTeX users is
   title = {mrfactors: MADRaT based package on factor inputs},
   author = {Debbora Leip and Edna {Molina Bacca}},
   year = {2023},
-  note = {R package version 0.3.4},
+  note = {R package version 0.3.5},
   url = {https://github.com/pik-piam/mrfactors},
 }
 ```
