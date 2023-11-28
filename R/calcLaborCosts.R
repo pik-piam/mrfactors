@@ -106,9 +106,9 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsect
     weight <- time_interpolate(weight, interpolated_year = setdiff(y, getItems(weight, dim = 2)),
                                extrapolation_type = "constant", integrate_interpolated_years = TRUE)[, y, ]
     sharesCrops <- toolFillWithRegionAvg(sharesCrops[, y, ], valueToReplace = 0, weight = weight,
-                                        regionmapping = h12, verbose = FALSE, warningThreshold = 1)
+                                         regionmapping = h12, verbose = FALSE, warningThreshold = 1)
     sharesLivst <- toolFillWithRegionAvg(sharesLivst[, y, ], valueToReplace = 0, weight = weight,
-                                        regionmapping = h12, verbose = FALSE, warningThreshold = 1)
+                                         regionmapping = h12, verbose = FALSE, warningThreshold = 1)
     shares <- setNames(mbind(sharesLivst, sharesCrops), c("Livestock", "Crops"))
     # assume livestock labor cost share for fish
     if (isTRUE(inclFish)) shares <- mbind(shares, setNames(sharesLivst, "Fisheries"))
@@ -135,12 +135,12 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsect
 
     # gtap data in mio. current US$MER
     if (gtapVar == "NVFA") {
-      gtap <- dimSums(readSource("GTAP81", "SF01"), dim = c("DIR", "PURCHVALUE"))
+      gtap <- dimSums(readSource("GTAPv8v9", "9:SF01"), dim = c("DIR", "PURCHVALUE"))
     } else if (gtapVar == "VFM") {
-      gtap <- readSource("GTAP81", "VFM")
+      gtap <- readSource("GTAPv8v9", "9:VFM")
       getSets(gtap) <- c("REG", "year", "DEMD_COMM", "PROD_COMM")
     } else if (gtapVar == "EVFA") {
-      gtap <- readSource("GTAP81", "AG03")
+      gtap <- readSource("GTAPv8v9", "9:AG03")
       getSets(gtap) <- c("REG", "year", "DEMD_COMM", "PROD_COMM")
     } else {
       stop("This GTAP variable is not available for labor costs")
