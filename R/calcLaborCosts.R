@@ -135,18 +135,18 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsect
 
     # gtap data in mio. current US$MER
     if (gtapVar == "NVFA") {
-      gtap <- dimSums(readSource("GTAPv8v9", "9:SF01"), dim = c("DIR", "PURCHVALUE"))
+      gtap <- dimSums(readSource("GTAPv8v9", "9:SF01"), dim = c("dir", "purchvalue"))
     } else if (gtapVar == "VFM") {
       gtap <- readSource("GTAPv8v9", "9:VFM")
-      getSets(gtap) <- c("REG", "year", "DEMD_COMM", "PROD_COMM")
+      getSets(gtap) <- c("reg", "year", "demd_comm", "prod_comm")
     } else if (gtapVar == "EVFA") {
       gtap <- readSource("GTAPv8v9", "9:AG03")
-      getSets(gtap) <- c("REG", "year", "DEMD_COMM", "PROD_COMM")
+      getSets(gtap) <- c("reg", "year", "demd_comm", "prod_comm")
     } else {
       stop("This GTAP variable is not available for labor costs")
     }
 
-    labor <- c("UnSkLab", "SkLab")
+    labor <- c("unsklab", "sklab")
 
     # https://www.gtap.agecon.purdue.edu/databases/contribute/detailedsector.asp
     kcr <- c("pdr", "wht", "gro", "v_f", "osd", "c_b", "pfb", "ocr")
@@ -167,8 +167,8 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsect
     }
 
     .getSector <- function(items, name) {
-      return(setNames(dimSums(gtap[, , list("DEMD_COMM" = labor, "PROD_COMM" = items)],
-                              dim = c("DEMD_COMM", "PROD_COMM")), name))
+      return(setNames(dimSums(gtap[, , list("demd_comm" = labor, "prod_comm" = items)],
+                              dim = c("demd_comm", "prod_comm")), name))
     }
 
     laborCosts <- mbind(Map(.getSector, items = sectors, name = sectorNames))
