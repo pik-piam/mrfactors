@@ -7,3 +7,5 @@
 ^codecov\.yml$
 ^\.github$
 ^.*CITATION.cff$
+^.*\.Rproj$
+^\.Rproj\.user$
