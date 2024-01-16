@@ -5,7 +5,6 @@
 #'
 #' @name mrfactors-package
 #' @aliases mrfactors-package mrfactors
-#' @docType package
 #' @author Maintainer: Debbora Leip <leip@pik-potsdam.de>
 #' @import madrat magclass mrdrivers mstools mrcommons
-NULL
+"_PACKAGE"
