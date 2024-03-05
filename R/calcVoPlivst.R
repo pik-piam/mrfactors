@@ -17,9 +17,9 @@
 #'
 calcVoPlivst <- function(other = FALSE, fillGaps = TRUE) {
 
-  # Value of production of individual items (current US$MER -> US$MER05)
-  item <- "Gross_Production_Value_(current_thousand_US$)_(1000_US$)"
-  vop <- readSource("FAO_online", "ValueOfProd")[, , item] / 1000 # mio. constant US$05MER
+  # Value of production of individual items (US$MER05)
+  item <- "Gross_Production_Value_(USDMER05)_(1000_US$)"
+  vop <- readSource("FAO_online", "ValueOfProd")[, , item] / 1000 # mio. US$MER05
 
   # mapping for aggregation
   mappingFAO <- toolGetMapping("FAO_VoP_kli.csv", type = "sectoral", where = "mrcommons")
@@ -43,8 +43,9 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE) {
     # fill with region averages where possible
     pricesRegional <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO",
                                              aggregate = TRUE, regionmapping = "regionmappingH12.csv"))
-    pricesRegional <- toolAggregate(pricesRegional, rel = toolGetMapping("regionmappingH12.csv",
-                                    where = "mappingfolder", type = "regional"),
+    pricesRegional <- toolAggregate(pricesRegional,
+                                    rel = toolGetMapping("regionmappingH12.csv", where = "mappingfolder",
+                                                         type = "regional"),
                                     from = "RegionCode", to = "CountryCode")
     prices[prices == 0] <- pricesRegional[prices == 0]
 
@@ -70,6 +71,6 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE) {
 
   return(list(x = vopLivst,
               weight = NULL,
-              unit = "USDMER05",
-              description = " Value of production for individual livestock categories in USDMER05"))
+              unit = "mio USDMER05",
+              description = " Value of production for individual livestock categories in million USDMER05"))
 }

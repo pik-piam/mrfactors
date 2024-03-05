@@ -9,6 +9,13 @@
 This package provides functions for MAgPIE input data on factor inputs to agricultural production
 (with a focus on capital and labor).
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/pik-piam/mrfactors}
+}
+
+}
 \author{
 Maintainer: Debbora Leip <leip@pik-potsdam.de>
 }

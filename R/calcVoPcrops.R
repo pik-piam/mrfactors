@@ -16,10 +16,9 @@
 #' }
 #'
 calcVoPcrops <- function(fillGaps = TRUE) {
-
-  # Value of production of individual items (current US$MER -> US$MER05)
-  item <- "Gross_Production_Value_(current_thousand_US$)_(1000_US$)"
-  vopAll <- readSource("FAO_online", "ValueOfProd")[, , item] / 1000 # mio. current US$MER
+  # Value of production of individual items (US$MER05)
+  item <- "Gross_Production_Value_(USDMER05)_(1000_US$)"
+  vopAll <- readSource("FAO_online", "ValueOfProd")[, , item] / 1000 # mio. US$MER05
 
   getNames(vopAll) <- gsub("\\..*", "", getNames(vopAll))
   getNames(vopAll)[getNames(vopAll) == "254|Oil palm fruit"] <- "254|Oil, palm fruit"
@@ -31,7 +30,7 @@ calcVoPcrops <- function(fillGaps = TRUE) {
 
   # Aggregation to magpie objects
   vopKcrAggregated <- toolAggregate(vopAll[, , itemsIntersect], rel = mappingFAO, from = "ProductionItem",
-                                      to = "kcr", weight = NULL, dim = 3)
+                                    to = "kcr", weight = NULL, dim = 3)
 
   # VoP in North Korea too high? -> excluded
   vopKcrAggregated["PRK", , ] <- 0
@@ -50,8 +49,9 @@ calcVoPcrops <- function(fillGaps = TRUE) {
     # fill with region averages where possible
     pricesRegional <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO",
                                              aggregate = TRUE, regionmapping = "regionmappingH12.csv"))
-    pricesRegional <- toolAggregate(pricesRegional, rel = toolGetMapping("regionmappingH12.csv",
-                                    where = "mappingfolder", type = "regional"),
+    pricesRegional <- toolAggregate(pricesRegional,
+                                    rel = toolGetMapping("regionmappingH12.csv", where = "mappingfolder",
+                                                         type = "regional"),
                                     from = "RegionCode", to = "CountryCode")[, , kPrices]
     prices[prices == 0] <- pricesRegional[prices == 0]
 
@@ -84,11 +84,11 @@ calcVoPcrops <- function(fillGaps = TRUE) {
   vopKcrAggregated[!is.finite(vopKcrAggregated)] <- 0
 
   weight <- NULL
-  units <- "USD05 MER"
+  units <- "mio USD05 MER"
 
- return(list(x = vopKcrAggregated,
-            weight = weight,
-            mixed_aggregation = NULL,
-            unit = units,
-            description = " Value of production for individual crops in 05USDMER"))
+  return(list(x = vopKcrAggregated,
+              weight = weight,
+              mixed_aggregation = NULL,
+              unit = units,
+              description = " Value of production for individual crops in million 05USDMER"))
 }

@@ -21,16 +21,16 @@ calcFractionInputsUSDA <- function(products = "kcr") {
 
   # assuming the same share in the middle of the decade
   tfpShares <- magpiesort(time_interpolate(tfpSharesRaw,
-                                            interpolated_year = c((getYears(tfpSharesRaw, as.integer = TRUE) + 5)),
-                                            extrapolation_type = "constant", integrate_interpolated_years = TRUE))
+                                           interpolated_year = c((getYears(tfpSharesRaw, as.integer = TRUE) + 5)),
+                                           extrapolation_type = "constant", integrate_interpolated_years = TRUE))
 
   # reads value of production
   voPAll <- readSource("FAO_online", "ValueOfProd")
 
   # mio. USD ton. VoP for crops
-  cropProdVop <- voPAll[, ,  "2041|Crops.Gross_Production_Value_(constant_2014_2016_thousand_US$)_(1000_US$)"]
+  cropProdVop <- voPAll[, ,  "2041|Crops.Gross_Production_Value_(USDMER05)_(1000_US$)"]
   # mio. USD ton. VoP for livestock
-  lvstProdVop <- voPAll[, , "2044|Livestock.Gross_Production_Value_(constant_2014_2016_thousand_US$)_(1000_US$)"]
+  lvstProdVop <- voPAll[, , "2044|Livestock.Gross_Production_Value_(USDMER05)_(1000_US$)"]
 
   # costs division between crops and livestock
   sharedInput <- c("Machinery", "AG_Labour") # factors that convene livestock and crops production
@@ -57,8 +57,8 @@ calcFractionInputsUSDA <- function(products = "kcr") {
     shareVoPcrop[!is.finite(shareVoPcrop)] <- 0
 
     # to normalize overall summation of considered inputs
-    totalInput <- shareVoPtotal[, years, ] * dimSums(tfpShares[, years, sharedInput], dim = 3) +
-                      shareVoPcrop[, years, ] * dimSums(tfpShares[, years, cropOnly], dim = 3)
+    totalInput <- (shareVoPtotal[, years, ] * dimSums(tfpShares[, years, sharedInput], dim = 3) +
+                     shareVoPcrop[, years, ] * dimSums(tfpShares[, years, cropOnly], dim = 3))
 
     # calculate shares
     sharedItems <- mbind(lapply(sharedInput, .calcFractionShared, shareVoPtotal, tfpShares, totalInput))
@@ -79,8 +79,8 @@ calcFractionInputsUSDA <- function(products = "kcr") {
     shareVoPlvst[!is.finite(shareVoPlvst)] <- 0
 
     # to normalize overall summation of considered inputs
-    totalInput <- shareVoPtotal[, years, ] * dimSums(tfpShares[, years, sharedInput], dim = 3) +
-                     shareVoPlvst[, years, ] * dimSums(tfpShares[, years, lvstOnly], dim = 3)
+    totalInput <- (shareVoPtotal[, years, ] * dimSums(tfpShares[, years, sharedInput], dim = 3) +
+                     shareVoPlvst[, years, ] * dimSums(tfpShares[, years, lvstOnly], dim = 3))
 
     # calculate shares
     sharedItems <- mbind(lapply(sharedInput, .calcFractionShared, shareVoPtotal, tfpShares, totalInput))
@@ -98,8 +98,8 @@ calcFractionInputsUSDA <- function(products = "kcr") {
 
   weight <- x
   weight[, , ] <- magpiesort(time_interpolate(production[, , ],
-                              interpolated_year = 2015, extrapolation_type = "constant",
-                              integrate_interpolated_years = TRUE))[, getYears(x), ]
+                                              interpolated_year = 2015, extrapolation_type = "constant",
+                                              integrate_interpolated_years = TRUE))[, getYears(x), ]
   weight[!is.finite(x)] <- 0
   weight[x == 0] <- 0
 

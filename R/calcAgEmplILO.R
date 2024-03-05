@@ -20,7 +20,7 @@ calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALS
 
   # read original employment dataset from ILO (convert from thous. to mil.)
   dataType <- ifelse(dataVersionILO == "", "EmplByActivityModelled",
-                      paste("EmplByActivityModelled", dataVersionILO, sep = "_"))
+                     paste("EmplByActivityModelled", dataVersionILO, sep = "_"))
   iloEmpl <- readSource("ILOSTAT", dataType)[, , list("Total", "Aggregate: Agriculture"), drop = TRUE]
   iloEmpl[iloEmpl == 0] <- NA
 
@@ -111,12 +111,12 @@ calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALS
 
   # shares between agriculture, forestry, fishery based on ag. empl.
   dataType <- ifelse(dataVersionILO == "", "EmplByISIC2",
-                      paste("EmplByISIC2", dataVersionILO, sep = "_"))
+                     paste("EmplByISIC2", dataVersionILO, sep = "_"))
   agEmplISIC2 <- readSource("ILOSTAT", dataType)[, , "Total", drop = TRUE]
 
   agEmpltotal <- new.magpie(cells_and_regions = getItems(agEmplISIC2, dim = 1),
-                       years = getItems(agEmplISIC2, dim = 2),
-                       names = c("Agriculture", "Forestry", "Fisheries"))
+                            years = getItems(agEmplISIC2, dim = 2),
+                            names = c("Agriculture", "Forestry", "Fisheries"))
 
   namesAgriculture <- c("ISIC_Rev31: 01 - Agriculture, hunting and related service activities",
                         "ISIC_Rev4: 01 - Crop and animal production, hunting and related service activities")
@@ -134,10 +134,10 @@ calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALS
 
   sharesAgEmpl <- .calcShares(agEmpltotal)
 
-  # shares between crop and livestock based on VoP (in mio. current USD, as currency is irrelevant for shares between
+  # shares between crop and livestock based on VoP (in mio. USDMER05, as currency is irrelevant for shares between
   # sectors)
-  ag <- list(c("2041|Crops", "2044|Livestock"), "Gross_Production_Value_(current_thousand_US$)_(1000_US$)")
-  vop <- readSource("FAO_online", "ValueOfProd")[, , ag, drop = TRUE] / 1000 # mio current USD
+  ag <- list(c("2041|Crops", "2044|Livestock"), "Gross_Production_Value_(USDMER05)_(1000_US$)")
+  vop <- readSource("FAO_online", "ValueOfProd")[, , ag, drop = TRUE] / 1000 # mio USDMER05
   getNames(vop) <- str_split(getNames(vop), "\\|", simplify = TRUE)[, 2]
   vop[vop == 0] <- NA
   sharesVoP <- .calcShares(vop)
