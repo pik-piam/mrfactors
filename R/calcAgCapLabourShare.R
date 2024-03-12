@@ -34,8 +34,9 @@ calcAgCapLabourShare <- function() {
   if (any(missingYears > min(getYears(weight, as.integer = TRUE)))) {
     stop("Need to fix weight for new years not covered in factor costs dataset")
   }
+  minYear <- min(getYears(weight, as.integer = TRUE))
   weight <- magpiesort(add_columns(weight, dim = 2, addnm = paste0("y", missingYears)))
-  weight[, missingYears, ] <- weight[, min(getYears(weight, as.integer = TRUE)), ]
+  weight[, missingYears, ] <- weight[, minYear, ]
 
   # Give 0 weigh to countries with unexpectedly high capital shares
   weight[c("BLZ", "CRI", "DOM", "HND", "JAM", "MEX", "NIC", "PAN", "SLV"), , ] <- 0
