@@ -124,7 +124,9 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
         totalLaborCosts <- totalLaborCosts[, , str_to_title(sector)]
       } else {
         agEmpl <- dimSums(agEmpl, dim = 3)
+        incl <- totalLaborCosts[, , "Livestock"] * totalLaborCosts[, , "Crops"]
         totalLaborCosts <- dimSums(totalLaborCosts, dim = 3)
+        totalLaborCosts[incl == 0] <- 0
       }
 
       # calculate hourly labor costs

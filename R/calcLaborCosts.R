@@ -128,8 +128,12 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsect
     # estimate total labor costs as share of VoP
     out <- vopAg[, years, ] * shares
 
-    # aggregate if subsectors is FALSE
-    if (isFALSE(subsectors)) out <- dimSums(out, dim = 3)
+    # aggregate if subsectors is FALSE, but only in cases where both crops and livestock are included
+    if (isFALSE(subsectors)) {
+      incl <- out[, , "Livestock"] * out[, , "Crops"]
+      out <- dimSums(out, dim = 3)
+      out[incl == 0] <- 0
+    }
 
   } else if (datasource == "GTAP") {
 

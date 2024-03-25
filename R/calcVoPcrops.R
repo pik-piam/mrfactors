@@ -83,6 +83,12 @@ calcVoPcrops <- function(fillGaps = TRUE) {
 
   vopKcrAggregated[!is.finite(vopKcrAggregated)] <- 0
 
+  # we exclude all year-country combinations for which less than 5 crop categories are reported
+  repValues <- dimSums(vopKcrAggregated > 0, dim = 3)
+  l5 <- repValues < 5
+  vopKcrAggregated[l5] <- 0
+
+
   weight <- NULL
   units <- "mio USD05 MER"
 
