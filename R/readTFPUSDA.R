@@ -43,7 +43,7 @@ readTFPUSDA <- function() {
   data <- extractFractions(names, ranges, file, regions)
 
   # Reads fao countries
-  isocodeFAO <- toolGetMapping("FAOiso_faocode.csv", where = "mrcommons")
+  isocodeFAO <- toolGetMapping("FAOiso_faocode.csv", where = "mrfaocore")
 
   # Merges read data with the fao mapping by country code
   data <- merge(data, isocodeFAO, by = "CountryCode", all = FALSE)[, c("ISO3", "Year", "Input", "Value")]
