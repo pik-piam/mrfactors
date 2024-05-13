@@ -1,8 +1,8 @@
 Type: Package
 Package: mrfactors
 Title: MADRaT based package on factor inputs
-Version: 0.3.12
-Date: 2024-03-25
+Version: 0.4.0
+Date: 2024-05-13
 Authors@R:
     c(person("Debbora", "Leip", , "leip@pik-potsdam.de", role = c("aut", "cre")),
       person("Edna", "Molina Bacca", role = "aut"))
@@ -14,8 +14,8 @@ Depends:
     magclass (>= 3.17),
     madrat (>= 2.20.9),
     mrdrivers (>= 1.0.0),
-    mstools,
-    mrcommons
+    mstools (>= 0.6.0),
+    mrcommons (>= 1.41.0)
 Imports:
     dplyr,
     magpiesets,
