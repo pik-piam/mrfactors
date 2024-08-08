@@ -1,6 +1,6 @@
 #' @title calcFactorIntensity
 #' @description Calculates factor intensity for labour and/or capital from USDA (Inputs share)
-#' and FAO (Value of Production)in 05USDppp per ton.
+#' and FAO (Value of Production).
 #' Capital intensity and requirements can also be calculated from FAO's CapitalStock database.
 #'
 #'
@@ -21,7 +21,7 @@
 #' a <- calcOutput("FactorIntensity")
 #' }
 #'
-calcFactorIntensity <- function(output = "intensities", method = "USDA") {
+calcFactorIntensity <- function(output = "intensities", method = "USDA", unit="constant 2005 US$MER") {
 
 
   if (method == "USDA") { # using USDA method
@@ -29,7 +29,7 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA") {
     # Production of crops. mio. ton
       cropProdDMall  <- collapseDim(calcOutput("Production", products = "kcr", aggregate = FALSE, attributes = "dm"))
 
-      vopCrops <- calcOutput("VoPcrops", aggregate = FALSE) # mio. 05USD MER
+      vopCrops <- calcOutput("VoPcrops", aggregate = FALSE, unit)
 
       gnames <- intersect(getNames(vopCrops), getNames(cropProdDMall))
       gyears <- intersect(getYears(vopCrops), getYears(cropProdDMall))
@@ -71,8 +71,8 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA") {
    } else if (method == "CapitalStock" && output %in% c("intensities", "requirements")) {
 
           # Fraction of each crop on overall Value of Production (Agriculture, Forestry and Fisheries)
-          vopCrops <- calcOutput("VoPcrops", aggregate = FALSE)
-          vopAff <- dimSums(calcOutput("VoPAFF", aggregate = FALSE), dim = 3)
+          vopCrops <- calcOutput("VoPcrops", aggregate = FALSE, unit = unit)
+          vopAff <- dimSums(calcOutput("VoPAFF", aggregate = FALSE, unit = unit), dim = 3)
           years <- intersect(getYears(vopCrops), getYears(vopAff))
           fractionVoPcrop <- vopCrops[, years, ] / vopAff[, years, ]
           fractionVoPcrop[!is.finite(fractionVoPcrop)] <- 0
@@ -80,8 +80,8 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA") {
           # Existing capital stocks
           name <- "22034|Net Capital Stocks (Agriculture, Forestry and Fishing).Value_USD_2015_prices_(millions)"
           capitalStocks <- readSource("FAO_online", "CapitalStock", convert = TRUE)[, , name]
-          capitalStocks <- convertGDP(capitalStocks, unit_in = "current US$MER",
-                                                     unit_out = "constant 2005 US$MER",
+          capitalStocks <- convertGDP(capitalStocks, unit_in = "constant 2015 US$MER",
+                                                     unit_out = unit,
                                                      replace_NAs = "no_conversion")
 
           years <- intersect(getYears(fractionVoPcrop), getYears(capitalStocks))
@@ -127,6 +127,8 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA") {
 
    units <-
    if (output %in% c("intensities", "requirements")) "05USDMER/tDM" else if (output == "CapitalShare") "fraction"
+   
+   units <- paste0("mio ",unit)
 
 
    return(list(x = x,

@@ -4,6 +4,7 @@
 #' @param other boolean: should FAO livestock categories that can't be matched to MAgPIE categories (i.e. beeswax, wool,
 #' silkworms, and honey) be reported as "livst_other"?
 #' @param fillGaps boolean: should gaps be filled using production * prices (where production data is available)?
+#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
 #' @return magpie object. in mio. USDMER05
 #' @author Debbora Leip
 #' @importFrom GDPuc convertGDP
@@ -15,7 +16,7 @@
 #' a <- calcOutput("VoPlivst")
 #' }
 #'
-calcVoPlivst <- function(other = FALSE, fillGaps = TRUE) {
+calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit="constant 2005 US$MER") {
 
   # Value of production of individual items (US$MER05)
   item <- "Gross_Production_Value_(USDMER05)_(1000_US$)"
@@ -68,9 +69,20 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE) {
     vopLivst[, years, ] <- tmp
     if (isTRUE(other)) vopLivst <- mbind(vopLivst, vopOther)
   }
-
+  
+  
+  if(unit !="constant 2005 US$MER"){
+    
+    vopKcrAggregated<-convertGDP(vopKcrAggregated,
+                                 unit_in = "constant 2005 US$MER",
+                                 unit_out = unit,
+                                 replace_NAs = "no_conversion")
+  }
+  
+  units <- paste0("mio ",unit)
+  
   return(list(x = vopLivst,
               weight = NULL,
-              unit = "mio USDMER05",
+              unit = units,
               description = " Value of production for individual livestock categories in million USDMER05"))
 }

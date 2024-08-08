@@ -3,6 +3,7 @@
 #' its fraction compared to overall Value of Production (Agriculture,Fish,Forestry).
 #'
 #' @param fillGaps boolean: should gaps be filled using production * prices (where production data is available)?
+#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
 #' @return magpie object. in mio. USD05 MER or fraction
 #' @author Edna J. Molina Bacca, Debbora Leip
 #' @importFrom dplyr intersect
@@ -15,7 +16,7 @@
 #' a <- calcOutput("VoPcrops")
 #' }
 #'
-calcVoPcrops <- function(fillGaps = TRUE) {
+calcVoPcrops <- function(fillGaps = TRUE, unit="constant 2005 US$MER") {
   # Value of production of individual items (US$MER05)
   item <- "Gross_Production_Value_(USDMER05)_(1000_US$)"
   vopAll <- readSource("FAO_online", "ValueOfProd")[, , item] / 1000 # mio. US$MER05
@@ -90,7 +91,18 @@ calcVoPcrops <- function(fillGaps = TRUE) {
 
 
   weight <- NULL
-  units <- "mio USD05 MER"
+  
+  if(unit !="constant 2005 US$MER"){
+  
+    vopKcrAggregated<-convertGDP(vopKcrAggregated,
+             unit_in = "constant 2005 US$MER",
+             unit_out = unit,
+             replace_NAs = "no_conversion")
+}
+  
+
+  
+  units <- paste0("mio ",unit)
 
   return(list(x = vopKcrAggregated,
               weight = weight,
