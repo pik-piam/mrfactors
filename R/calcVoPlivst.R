@@ -73,10 +73,10 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit="constant 2005 US$
   
   if(unit !="constant 2005 US$MER"){
     
-    vopKcrAggregated<-convertGDP(vopKcrAggregated,
-                                 unit_in = "constant 2005 US$MER",
-                                 unit_out = unit,
-                                 replace_NAs = "no_conversion")
+    vopLivst<-convertGDP(vopLivst,
+                        unit_in = "constant 2005 US$MER",
+                        unit_out = unit,
+                        replace_NAs = "no_conversion")
   }
   
   units <- paste0("mio ",unit)
