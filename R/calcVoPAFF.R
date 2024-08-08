@@ -2,6 +2,7 @@
 #' @description Calculates the overall value of production of the agriculture,
 #' forestry and fisheries sectors. Forestry and Fisheries are calculated from exports values.
 #'
+#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
 #' @return magpie object. in mio. 05USD MER units
 #' @author Edna J. Molina Bacca, Debbora Leip
 #' @importFrom dplyr intersect

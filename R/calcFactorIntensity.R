@@ -9,6 +9,7 @@
 #' "requirements" (Capital Stock requirements per ton), and "CapitalShare" for "USDA" method.
 #' For the "CapitalStock" method only "intensities" and "requirements" outputs supported.
 #' @param method "USDA" or "CapitalStock"
+#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
 #' @return magpie object of the factor requirements intensity or factor intensity in 05USDppp/tDM per crop,
 #' or capital share fraction.
 #' @author Edna J. Molina Bacca

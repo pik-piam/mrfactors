@@ -1,6 +1,7 @@
 #' @title calcProductionCosts
 #' @description calculates agricultural production costs (split into different cost categories)
 #' @param datasource Datasource of production costs, currently only "Vittis"
+#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @author Debbora Leip
 #' @examples

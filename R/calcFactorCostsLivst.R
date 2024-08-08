@@ -4,6 +4,7 @@
 #' to VoP from FAO)
 #' @param otherLivst boolean: should FAO livestock categories that can't be matched to MAgPIE categories (i.e. beeswax,
 #' wool, silkworms, and honey) be reported as "livst_other"?
+#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @author Debbora Leip
 #' @examples
@@ -55,7 +56,7 @@ calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit =
     stop("Datasource not available")
   }
 
-  units <- paste0("mio ",unit)
+  units <- paste0("mio ", unit)
   
   return(list(x = out,
               weight = NULL,
