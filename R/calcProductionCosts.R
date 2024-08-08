@@ -8,7 +8,7 @@
 #' calcOutput("ProductionCosts", source = "Vittis")
 #' }
 #'
-calcProductionCosts <- function(datasource = "Vittis") {
+calcProductionCosts <- function(datasource = "Vittis", unit="constant 2005 US$MER") {
   if (datasource == "Vittis") {
     costs <- readSource("Vittis")                                        # US$05/ha
     areas <- calcOutput("Croparea", sectoral = "kcr", aggregate = FALSE) # "million ha"
@@ -19,8 +19,19 @@ calcProductionCosts <- function(datasource = "Vittis") {
   } else {
     stop("Source not available")
   }
+  
+  if(unit !="constant 2005 US$MER"){
+    
+    costs<-convertGDP(costs,
+                         unit_in = "constant 2005 US$MER",
+                         unit_out = unit,
+                         replace_NAs = "no_conversion")
+  }
+  
+  units <- paste0("mio ",unit)
+  
   return(list(x = costs,
               weight = NULL,
-              unit = "million US$05/yr",
+              unit = units,
               description = "production costs"))
 }
