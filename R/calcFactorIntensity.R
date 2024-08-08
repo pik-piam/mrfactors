@@ -126,10 +126,8 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA", unit="c
   }
 
    units <-
-   if (output %in% c("intensities", "requirements")) "05USDMER/tDM" else if (output == "CapitalShare") "fraction"
+   if (output %in% c("intensities", "requirements")) paste0("mio ",unit) else if (output == "CapitalShare") "fraction"
    
-   units <- paste0("mio ",unit)
-
 
    return(list(x = x,
                weight = weight,
