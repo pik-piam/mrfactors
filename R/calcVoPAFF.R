@@ -15,11 +15,11 @@
 #' a <- calcOutput("VoPAFF")
 #' }
 #'
-calcVoPAFF <- function(unit="constant 2005 US$MER") {
+calcVoPAFF <- function(unit="constant 2017 US$MER") {
 
 #### Value of production for Agriculture (crops and livestock)
-  vopCrops <- calcOutput("VoPcrops", aggregate = FALSE,unit=unit)
-  vopLivst <- calcOutput("VoPlivst", other = TRUE, aggregate = FALSE, unit=unit)
+  vopCrops <- calcOutput("VoPcrops", aggregate = FALSE,unit="constant 2017 US$MER")
+  vopLivst <- calcOutput("VoPlivst", other = TRUE, aggregate = FALSE, unit="constant 2017 US$MER")
 
   vopAg <- setNames(dimSums(vopCrops, dim = 3) + dimSums(vopLivst, dim = 3), "Agriculture")
 
@@ -47,7 +47,7 @@ calcVoPAFF <- function(unit="constant 2005 US$MER") {
              prodFishTonNet[cellsFish, yearsFish, ] / 1000  # mio. current USD
   vopFish <- convertGDP(vopFish,
                          unit_in = "current US$MER",
-                         unit_out = unit,
+                         unit_out = "constant 2017 US$MER",
                          replace_NAs = "no_conversion")
 
   vopFish[!is.finite(vopFish)] <- 0
@@ -68,7 +68,7 @@ calcVoPAFF <- function(unit="constant 2005 US$MER") {
   # Base year change for exports value
   priceForestry <- convertGDP(priceForestry,
                                unit_in = "current US$MER",
-                               unit_out = unit,
+                               unit_out = "constant 2017 US$MER",
                                replace_NAs = "no_conversion")
 
   priceForestry[!is.finite(priceForestry)] <- 0
@@ -89,6 +89,13 @@ calcVoPAFF <- function(unit="constant 2005 US$MER") {
   x <- mbind(vopAg[cellsVoP, yearsVoP, ], vopFish[cellsVoP, yearsVoP, ],
              vopForestry[cellsVoP, yearsVoP, ])
   x[!is.finite(x)] <- 0
+  
+  if(unit != "constant 2017 US$MER"){
+    x<-convertGDP(x,
+                  unit_in = "constant 2017 US$MER",
+                  unit_out = unit,
+                  replace_NAs = "no_conversion")  
+  }    
 
   units <- paste0("mio ",unit)
   

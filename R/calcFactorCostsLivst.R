@@ -13,11 +13,11 @@
 #' }
 #' @importFrom magclass setNames dimSums time_interpolate
 
-calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit = "constant 2005 US$MER") {
+calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit = "constant 2017 US$MER") {
 
   if (datasource == "USDA") {
     # Value of Production for livestock in US$MER2005 (including FAO livst categories not mapped to MAgPIE categories)
-    vopLivst <- calcOutput("VoPlivst", fillGaps = TRUE, aggregate = FALSE, other = otherLivst, unit = unit) 
+    vopLivst <- calcOutput("VoPlivst", fillGaps = TRUE, aggregate = FALSE, other = otherLivst, unit = "constant 2017 US$MER") 
 
     # no VoP data before 1991, data for 2019 incomplete
     years <- setdiff(getYears(vopLivst, as.integer = TRUE), c(1960:1990, 2019))
@@ -55,7 +55,14 @@ calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit =
   } else {
     stop("Datasource not available")
   }
-
+  
+  if(unit != "constant 2017 US$MER"){
+    out<-convertGDP(out,
+                         unit_in = "constant 2017 US$MER",
+                         unit_out = unit,
+                         replace_NAs = "no_conversion")  
+  }   
+  
   units <- paste0("mio ", unit)
   
   return(list(x = out,

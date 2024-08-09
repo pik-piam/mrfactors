@@ -16,11 +16,11 @@
 #' a <- calcOutput("VoPlivst")
 #' }
 #'
-calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit="constant 2005 US$MER") {
+calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit="constant 2017 US$MER") {
 
   # Value of production of individual items (US$MER05)
-  item <- "Gross_Production_Value_(USDMER05)_(1000_US$)"
-  vop <- readSource("FAO_online", "ValueOfProd")[, , item] / 1000 # mio. US$MER05
+  item <- "Gross_Production_Value_(USDMER17)_(1000_US$)"
+  vop <- readSource("FAO_online", "ValueOfProd")[, , item] / 1000 # mio. US$MER17
 
   # mapping for aggregation
   mappingFAO <- toolGetMapping("FAO_VoP_kli.csv", type = "sectoral", where = "mrcommons")
@@ -39,11 +39,11 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit="constant 2005 US$
   if (isTRUE(fillGaps)) {
     kli <- findset("kli")
     production <- collapseDim(calcOutput("Production", products = "kli", attributes = "dm", aggregate = FALSE))
-    prices <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO", aggregate = FALSE))
+    prices <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO", aggregate = FALSE, unit = "constant 2017 US$MER"))
 
     # fill with region averages where possible
     pricesRegional <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO",
-                                             aggregate = TRUE, regionmapping = "regionmappingH12.csv"))
+                                             aggregate = TRUE, regionmapping = "regionmappingH12.csv", unit = "constant 2017 US$MER"))
     pricesRegional <- toolAggregate(pricesRegional,
                                     rel = toolGetMapping("regionmappingH12.csv", where = "mappingfolder",
                                                          type = "regional"),
@@ -52,7 +52,7 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit="constant 2005 US$
 
     # fill remaining gaps with global averages
     pricesGLO <- prices
-    pricesGLO[, , ] <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO", aggregate = "GLO"))
+    pricesGLO[, , ] <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO", aggregate = "GLO", unit = "constant 2017 US$MER"))
     prices[prices == 0] <- pricesGLO[prices == 0]
 
     prices <- prices[, , kli]
@@ -70,19 +70,18 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit="constant 2005 US$
     if (isTRUE(other)) vopLivst <- mbind(vopLivst, vopOther)
   }
   
-  
-  if(unit !="constant 2005 US$MER"){
+
+    if(unit != "constant 2017 US$MER"){
+      vopLivst<-convertGDP(vopLivst,
+                           unit_in = "constant 2017 US$MER",
+                           unit_out = unit,
+                           replace_NAs = "no_conversion")  
+    }    
     
-    vopLivst<-convertGDP(vopLivst,
-                        unit_in = "constant 2005 US$MER",
-                        unit_out = unit,
-                        replace_NAs = "no_conversion")
-  }
-  
   units <- paste0("mio ",unit)
   
   return(list(x = vopLivst,
               weight = NULL,
               unit = units,
-              description = " Value of production for individual livestock categories in million USDMER05"))
+              description = " Value of production for individual livestock categories"))
 }
