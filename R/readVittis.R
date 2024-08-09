@@ -27,5 +27,11 @@ readVittis <- function() {
                                "Seeds", "Financing", "Fuel_Lubricant", "Fertilizer",
                                "Irrigation", "Labor")
 
+    
+    data<-convertGDP(data,
+                      unit_in =  "constant 2005 US$MER",
+                      unit_out = "constant 2017 US$MER",
+                      replace_NAs = "no_conversion")
+
   return(data)
 }

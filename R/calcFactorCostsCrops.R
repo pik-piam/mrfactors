@@ -2,6 +2,7 @@
 #' @description calculates factor costs for crop production in mio. US$MER05
 #' @param datasource only source available is "USDA" (calculates factor costs by applying factor cost share from USDA
 #' to VoP from FAO)
+#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @author Debbora Leip
 #' @examples
@@ -10,11 +11,11 @@
 #' }
 #' @importFrom magclass setNames dimSums time_interpolate
 
-calcFactorCostsCrops <- function(datasource = "USDA") {
+calcFactorCostsCrops <- function(datasource = "USDA", unit="constant 2017 US$MER") {
 
   if (datasource == "USDA") {
-    # Value of Production for livestock in US$MER2005 (including FAO livst categories not mapped to MAgPIE categories)
-    vopCrops <- calcOutput("VoPcrops", fillGaps = TRUE, aggregate = FALSE) # mio. US$MER05
+    # Value of Production for livestock in US$MER2017 (including FAO livst categories not mapped to MAgPIE categories)
+    vopCrops <- calcOutput("VoPcrops", fillGaps = TRUE, aggregate = FALSE, unit="constant 2017 US$MER") 
 
     # no VoP data before 1991, data for 2019 incomplete
     years <- setdiff(getYears(vopCrops, as.integer = TRUE), c(1960:1990, 2019))
@@ -52,9 +53,19 @@ calcFactorCostsCrops <- function(datasource = "USDA") {
   } else {
     stop("Datasource not available")
   }
-
+  
+  if(unit != "constant 2017 US$MER"){
+    out <- convertGDP(out,
+                         unit_in = "constant 2017 US$MER",
+                         unit_out = unit,
+                         replace_NAs = "no_conversion")  
+  }   
+  
+  
+  units <- paste0("mio ",unit)
+  
   return(list(x = out,
               weight = NULL,
-              unit = "mio. USD05MER",
+              unit = units,
               description = "Factor costs for crop production"))
 }
