@@ -4,7 +4,7 @@
 #'
 #' @param fillGaps boolean: should gaps be filled using production * prices (where production data is available)?
 #' @param unit output currency unit based on the convertGDP function from the  GDPuc library
-#' @return magpie object. in mio. USD05 MER or fraction
+#' @return magpie object. in mio. USD or fraction
 #' @author Edna J. Molina Bacca, Debbora Leip
 #' @importFrom dplyr intersect
 #' @importFrom GDPuc convertGDP
@@ -16,7 +16,7 @@
 #' a <- calcOutput("VoPcrops")
 #' }
 #'
-calcVoPcrops <- function(fillGaps = TRUE, unit="constant 2017 US$MER") {
+calcVoPcrops <- function(fillGaps = TRUE, unit = "constant 2017 US$MER") {
   # Value of production of individual items (US$MER17)
   item <- "Gross_Production_Value_(USDMER17)_(1000_US$)"
   vopAll <- readSource("FAO_online", "ValueOfProd")[, , item] / 1000 # mio. US$MER17
@@ -96,10 +96,10 @@ calcVoPcrops <- function(fillGaps = TRUE, unit="constant 2017 US$MER") {
   weight <- NULL
   
   if(unit != "constant 2017 US$MER"){
-    vopKcrAggregated<-convertGDP(vopKcrAggregated,
-                         unit_in = "constant 2017 US$MER",
-                         unit_out = unit,
-                         replace_NAs = "no_conversion")  
+    vopKcrAggregated <- convertGDP(vopKcrAggregated,
+                                   unit_in = "constant 2017 US$MER",
+                                   unit_out = unit,
+                                   replace_NAs = "no_conversion")  
   }    
   
 
