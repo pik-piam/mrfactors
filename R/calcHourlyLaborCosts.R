@@ -3,7 +3,7 @@
 #' @param datasource either raw data from "ILO" (agriculture+forestry+fishery) or data calculated based on total labor
 #' costs from "USDA_FAO" (crop+livestock production).
 #' @param dataVersionILO Which version of ILO data to use (for hourly labor costs if source is ILO, for ag empl. if
-#' source is USDA_FAO). "" for the oldest version, or "monthYear" (e.g. "Aug23") for a newer version)
+#' source is USDA_FAO). "" for the oldest version, or "monthYear" (e.g. "Aug24") for a newer version)
 #' @param sector should average hourly labor costs be reported ("agriculture"), or hourly labor costs specific to
 #' either "crops" or "livestock" production. For ILO only the aggregate hourly labor costs are available.
 #' @param fillWithRegression boolean: should missing values be filled based on a regression between ILO hourly labor
@@ -25,7 +25,7 @@
 #' @importFrom stringr str_split str_to_title
 
 
-calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug23", # nolint: cyclocomp_linter
+calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug24", # nolint: cyclocomp_linter
                                  sector = "agriculture", fillWithRegression = TRUE, calibYear = 2010,
                                  cutAfterCalibYear = TRUE, projection = FALSE) {
 
@@ -40,7 +40,7 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
       items <- c("ISIC_Rev31: A Agriculture, hunting and forestry", "ISIC_Rev31: B Fishing",
                  "ISIC_Rev4: A Agriculture; forestry and fishing")
       hourlyCosts <- readSource("ILOSTAT", datasource)[, , items]
-      hourlyCosts <- hourlyCosts[, , "US$MER2005", drop = TRUE]
+      hourlyCosts <- hourlyCosts[, , "US$MER2017", drop = TRUE]
 
       # aggregate within rev 3.1
       mapping <- data.frame(from = c("ISIC_Rev31: A Agriculture, hunting and forestry",
@@ -68,6 +68,10 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
       hourlyCostsIndia <- c(0.2063, 0.2080, 0.2015, 0.1970, 0.1936, 0.1964, 0.2014, 0.2350, 0.2520,
                             0.2672, 0.3097, 0.3336, 0.3568, 0.3795, 0.3903, 0.3956, 0.4008)
       hourlyCosts["IND", setdiff(2000:2017, 2006), ] <- hourlyCostsIndia
+      hourlyCosts["IND", , ] <- convertGDP(hourlyCosts["IND", , ],
+                                           unit_in = "constant 2005 US$MER",
+                                           unit_out = "constant 2017 US$MER",
+                                           replace_NAs = c("linear", "no_conversion"))
 
       # add data for China, aggregated using production as weight (provided by Xiaoxi)
       hourlyCostsChina <- readSource("HourlyLaborCostsChina", convert = FALSE)
@@ -84,12 +88,16 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
 
       years <- intersect(getYears(hourlyCosts), getYears(hourlyCostsChina))
       hourlyCosts["CHN", years, ] <- hourlyCostsChina[, years, ]
+      hourlyCosts["CHN", , ] <- convertGDP(hourlyCosts["CHN", , ],
+                                           unit_in = "constant 2005 US$MER",
+                                           unit_out = "constant 2017 US$MER",
+                                           replace_NAs = c("linear", "no_conversion"))
 
       # remove outliers
       hourlyCosts[hourlyCosts > 100] <- 0 # unreasonable high values
       gdpMERpc <- calcOutput("GDPpc",
                              scenario = "SSPs",
-                             unit = "constant 2005 US$MER",
+                             unit = "constant 2017 US$MER",
                              average2020 = FALSE,
                              naming = "scenario",
                              aggregate = FALSE)[getItems(hourlyCosts, dim = 1), getItems(hourlyCosts, dim = 2), "SSP2"]
@@ -138,10 +146,10 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
     hourlyCosts <- calcOutput("HourlyLaborCosts", dataVersionILO = dataVersionILO, datasource = datasource,
                               sector = sector, fillWithRegression = FALSE, aggregate = FALSE)
 
-    # calculate GDPpc [USD05MER] for regression
+    # calculate GDPpc [USD2017MER] for regression
     gdpMERpc <- calcOutput("GDPpc",
                            scenario = "SSPs",
-                           unit = "constant 2005 US$MER",
+                           unit = "constant 2017 US$MER",
                            average2020 = FALSE,
                            naming = "scenario",
                            aggregate = FALSE)
@@ -257,6 +265,6 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
 
   return(list(x = hourlyCosts,
               weight = weight,
-              unit = "US$05MER",
+              unit = "US$2017MER",
               description = "Mean nominal hourly labour cost per employee in agriculture"))
 }

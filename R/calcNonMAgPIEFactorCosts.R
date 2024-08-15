@@ -7,7 +7,7 @@
 #' @param aggSubsidies boolean: if subtype is "subsidies", should crop and livestock subsidies be reported separately
 #' or as aggregate?
 #' @param extrapolate boolean: should values be extrapolate (by keeping constant) until 2150?
-#' @return magpie object. in mio. USDMER05
+#' @return magpie object. in mio. USD
 #' @author Debbora Leip
 #' @seealso [calcOutput()]
 #' @examples
@@ -24,7 +24,7 @@ calcNonMAgPIEFactorCosts <- function(subtype = "subsidies", aggSubsidies = FALSE
   fractionLivst <- setNames(dimSums(fractionLivst[, , c("Labor", "Capital")], dim = 3), "Livestock")
   fractions <- mbind(fractionCrops, fractionLivst)
 
-  if (subtype == "subsidies") { # ag. subsidies in mio.USD05MER
+  if (subtype == "subsidies") { # ag. subsidies in mio.USD2017MER
     out <- calcOutput("IFPRIsubsidy", aggregate = FALSE, fillGaps = TRUE)
 
     # get factor cost share of subsidies
@@ -71,6 +71,6 @@ calcNonMAgPIEFactorCosts <- function(subtype = "subsidies", aggSubsidies = FALSE
 
   return(list(x = out,
               weight = NULL,
-              unit = "mio. USDMER05",
+              unit = "mio. USDMER2017",
               description = "Factor costs affecting employment but not included in MAgPIE factor costs"))
 }

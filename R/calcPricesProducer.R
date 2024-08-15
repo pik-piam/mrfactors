@@ -23,7 +23,7 @@ calcPricesProducer <- function(products = "kcr", calculation = "VoP", weighting 
   if (products == "kcr") {
   if (calculation == "FAO") {
     # items for aggregation
-    pricesProdFAO <- readSource("FAO_online", "PricesProducerAnnual") # USD05MER per ton wet matter
+    pricesProdFAO <- readSource("FAO_online", "PricesProducerAnnual") # USD2017MER per ton wet matter
 
 
     getNames(pricesProdFAO)[getNames(pricesProdFAO) == "254|Oil palm fruit"] <- "254|Oil, palm fruit"
@@ -128,7 +128,7 @@ stop("only production and consumption weights")
 
     if (calculation == "FAO") {
 
-    pricesProdFAO <- readSource("FAO_online", "PricesProducerAnnual") # USD05 per ton
+    pricesProdFAO <- readSource("FAO_online", "PricesProducerAnnual") # USD2017 per ton
 
     # get mapping
     mappingFAO <- toolGetMapping("FAOitems_online.csv", type = "sectoral", where = "mappingfolder") # Reads mapping
@@ -203,11 +203,11 @@ stop("invalid type")
     }
   }
 
-  units <- "05USDMER/tDM"
+  units <- "2017USDMER/tDM"
 
   return(list(x = x,
               weight = weight,
               mixed_aggregation = NULL,
               unit = units,
-              description = "Producer prices in 05USDMER/tDM"))
+              description = "Producer prices in 2017USDMER/tDM"))
 }

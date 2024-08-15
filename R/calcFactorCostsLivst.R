@@ -17,7 +17,8 @@ calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit =
 
   if (datasource == "USDA") {
     # Value of Production for livestock in US$MER2005 (including FAO livst categories not mapped to MAgPIE categories)
-    vopLivst <- calcOutput("VoPlivst", fillGaps = TRUE, aggregate = FALSE, other = otherLivst, unit = "constant 2017 US$MER") 
+    vopLivst <- calcOutput("VoPlivst", fillGaps = TRUE, aggregate = FALSE, other = otherLivst,
+                           unit = "constant 2017 US$MER")
 
     # no VoP data before 1991, data for 2019 incomplete
     years <- setdiff(getYears(vopLivst, as.integer = TRUE), c(1960:1990, 2019))

@@ -10,7 +10,7 @@
 #' For the "CapitalStock" method only "intensities" and "requirements" outputs supported.
 #' @param method "USDA" or "CapitalStock"
 #' @param unit output currency unit based on the convertGDP function from the  GDPuc library
-#' @return magpie object of the factor requirements intensity or factor intensity in 05USDppp/tDM per crop,
+#' @return magpie object of the factor requirements intensity or factor intensity in USD/tDM per crop,
 #' or capital share fraction.
 #' @author Edna J. Molina Bacca
 #' @importFrom luscale speed_aggregate
@@ -22,7 +22,7 @@
 #' a <- calcOutput("FactorIntensity")
 #' }
 #'
-calcFactorIntensity <- function(output = "intensities", method = "USDA", unit="constant 2017 US$MER") {
+calcFactorIntensity <- function(output = "intensities", method = "USDA", unit = "constant 2017 US$MER") {
 
 
   if (method == "USDA") { # using USDA method
@@ -30,7 +30,7 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA", unit="c
     # Production of crops. mio. ton
       cropProdDMall  <- collapseDim(calcOutput("Production", products = "kcr", aggregate = FALSE, attributes = "dm"))
 
-      vopCrops <- calcOutput("VoPcrops", aggregate = FALSE, unit="constant 2017 US$MER")
+      vopCrops <- calcOutput("VoPcrops", aggregate = FALSE, unit = "constant 2017 US$MER")
 
       gnames <- intersect(getNames(vopCrops), getNames(cropProdDMall))
       gyears <- intersect(getYears(vopCrops), getYears(cropProdDMall))
@@ -127,7 +127,7 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA", unit="c
   }
 
    units <-
-   if (output %in% c("intensities", "requirements")) paste0("mio ",unit) else if (output == "CapitalShare") "fraction"
+   if (output %in% c("intensities", "requirements")) paste0("mio ", unit) else if (output == "CapitalShare") "fraction"
    
    if(unit != "constant 2017 US$MER" & output %in% c("intensities", "requirements")){
      x <- convertGDP(x,
