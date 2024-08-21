@@ -7,7 +7,7 @@
 #' "HourlyLaborCosts" for a regression between  mean nominal hourly labor cost per employee in
 #' agriculture and GDP pc MER05.
 #' @param dataVersionILO which version of the ILO input data and regression to use. "" for the oldest version and
-#' old regression, or "monthYear" (e.g. "Aug23") for newer data with the new regression type
+#' old regression, or "monthYear" (e.g. "Aug24") for newer data with the new regression type
 #' @param thresholdWage  only relevant for linear hourly labor cost regression: for low GDP pc MER, the regression
 #' between hourly labor costs and GDP pc MER can lead to unreasonably low or even negative hourly labor costs.
 #' Therefore, we set all hourly labor costs below this threshold to the threshold.
@@ -23,7 +23,7 @@
 #'     a <- calcOutput("RegressionsILO", subtype = "HourlyLaborCosts")
 #' }
 
-calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug23",
+calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24",
                                thresholdWage = 0.1, forceWageIntercept = TRUE,
                                wageRegrType = NULL, recalculate = FALSE) {
 
@@ -71,8 +71,8 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug23"
     share <- iloEmpl[, getYears(pop), "Total", drop = TRUE] / pop[, , , drop = TRUE]
     getNames(share) <- "share_empl_ag"
 
-    # GDP per capita as independent variable (sqrt(share of people in ag.) ~ log_10(GDPpcPPP))
-    gdpPc <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2005 Int$PPP", aggregate = FALSE)
+    # GDP per capita as independent variable (updated currency baseyear since Aug 24)
+    gdpPc <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2017 Int$PPP", aggregate = FALSE)
 
     years <- intersect(getYears(share), getYears(gdpPc))
     gdpPc <- gdpPc[, years, ]
@@ -96,7 +96,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug23"
     data$transformedGDPpcPPP    <- log(data$GDPpcPPP, base = 10)
     data$transformedshareEmplAg <- sqrt(data$shareEmplAg)
 
-    # regression
+    # regression (sqrt(share of people in ag.) ~ log_10(GDPpcPPP))
     reg       <- lm(transformedshareEmplAg ~ transformedGDPpcPPP, data = data, weights = pop)
     intercept <- reg$coefficients["(Intercept)"][[1]]
     slope     <- reg$coefficients["transformedGDPpcPPP"][[1]]
@@ -122,8 +122,8 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug23"
                                   fillWithRegression = FALSE, aggregate = FALSE)
     hourlyLaborCosts[hourlyLaborCosts == 0] <- NA
 
-    ## GDP PER CAPITA IN US$MER AS DEPENDENT VARIABLE
-    gdpPcMER <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2005 US$MER", aggregate = FALSE)
+    ## GDP PER CAPITA IN US$MER AS DEPENDENT VARIABLE (updated currency baseyear since Aug 24)
+    gdpPcMER <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2017 US$MER", aggregate = FALSE)
 
     ## combining data
     years <- intersect(getItems(hourlyLaborCosts, dim = 2), getItems(gdpPcMER, dim = 2))

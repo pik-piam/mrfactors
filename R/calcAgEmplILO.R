@@ -7,7 +7,7 @@
 #' @param inclFish boolean: should employment in fisheries be included?
 #' @param inclForest boolean: should emplyoment in forestry be included?
 #' @param dataVersionILO which version of the ILO input data to use. "" for the oldest version and
-#' old regression, or "monthYear" (e.g. "Aug23") for newer data
+#' old regression, or "monthYear" (e.g. "Aug24") for newer data
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @importFrom stringr str_split
 #' @author Debbora Leip
@@ -16,7 +16,7 @@
 #' calcOutput("AgEmplILO")
 #' }
 
-calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALSE, dataVersionILO = "Aug23") {
+calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALSE, dataVersionILO = "Aug24") {
 
   # read original employment dataset from ILO (convert from thous. to mil.)
   dataType <- ifelse(dataVersionILO == "", "EmplByActivityModelled",
@@ -33,7 +33,7 @@ calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALS
   subtype <- ifelse(dataVersionILO == "", "AgEmplShare", paste("AgEmplShare", dataVersionILO, sep = "_"))
   regCoeff <- readSource("RegressionsILO", subtype)
 
-  gdpPPPpc <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2005 Int$PPP", aggregate = FALSE)
+  gdpPPPpc <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2017 Int$PPP", aggregate = FALSE)
 
   estShare <- (regCoeff[, , "slope", drop = TRUE] * log10(gdpPPPpc) + regCoeff[, , "intercept", drop = TRUE]) ** 2
   const <- (regCoeff[, , "slope"] * log10(regCoeff[, , "threshold"]) + regCoeff[, , "intercept"]) ** 2

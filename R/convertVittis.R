@@ -1,6 +1,6 @@
 #' @title convertVittis
 #' @description Aggregate production costs from Vittis dataset to MAgPIE crop
-#' categories and change unit from US$2000 to US$2005.
+#' categories and change unit from USD PPP 2000 to USD MER 2017.
 #' @param x MAgPIE object to be converted
 #' @return A MAgPIE object containing national-scale costs of production for
 #' 10 crops, disaggregated in 9 distinct cost elements
@@ -17,8 +17,8 @@ convertVittis <- function(x) {
     toolAggregate(mapping, from = "ProductionItem", to = "Vittis", dim = 3)
   x <- toolAggregate(x, mapping, weight = weights, from = "Vittis", to = "kcr", dim = 3.2)
 
-  # Convert from "constant 2000 Int$PPP" to "constant 2005 Int$PPP"
-  x <- GDPuc::convertGDP(x, "constant 2000 Int$PPP", "constant 2005 Int$PPP", replace_NAs = c("linear", 0))
+  # Convert from "constant 2000 Int$PPP" to "constant 2017 US$MER"
+  x <- GDPuc::convertGDP(x, "constant 2000 Int$PPP", "constant 2017 US$MER", replace_NAs = c("linear", 0))
 
   # fill missing countries with average over corresponding world region
   mapping <- toolGetMapping("regionmappingH12.csv", type = "regional", where = "mappingfolder")

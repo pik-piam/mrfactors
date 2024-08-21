@@ -5,7 +5,7 @@
 #' silkworms, and honey) be reported as "livst_other"?
 #' @param fillGaps boolean: should gaps be filled using production * prices (where production data is available)?
 #' @param unit output currency unit based on the convertGDP function from the  GDPuc library
-#' @return magpie object. in mio. USDMER05
+#' @return magpie object
 #' @author Debbora Leip
 #' @importFrom GDPuc convertGDP
 #' @importFrom magpiesets findset
@@ -16,7 +16,7 @@
 #' a <- calcOutput("VoPlivst")
 #' }
 #'
-calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit="constant 2017 US$MER") {
+calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit = "constant 2017 US$MER") {
 
   # Value of production of individual items (US$MER05)
   item <- "Gross_Production_Value_(USDMER17)_(1000_US$)"
@@ -72,13 +72,13 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit="constant 2017 US$
   
 
     if(unit != "constant 2017 US$MER"){
-      vopLivst<-convertGDP(vopLivst,
-                           unit_in = "constant 2017 US$MER",
-                           unit_out = unit,
-                           replace_NAs = "no_conversion")  
+      vopLivst <- convertGDP(vopLivst,
+                             unit_in = "constant 2017 US$MER",
+                             unit_out = unit,
+                             replace_NAs = "no_conversion")  
     }    
     
-  units <- paste0("mio ",unit)
+  units <- paste0("mio ", unit)
   
   return(list(x = vopLivst,
               weight = NULL,
