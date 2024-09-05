@@ -4,16 +4,18 @@
 \alias{calcVoPlivst}
 \title{calcVoPlivst}
 \usage{
-calcVoPlivst(other = FALSE, fillGaps = TRUE)
+calcVoPlivst(other = FALSE, fillGaps = TRUE, unit = "constant 2017 US$MER")
 }
 \arguments{
 \item{other}{boolean: should FAO livestock categories that can't be matched to MAgPIE categories (i.e. beeswax, wool,
 silkworms, and honey) be reported as "livst_other"?}
 
 \item{fillGaps}{boolean: should gaps be filled using production * prices (where production data is available)?}
+
+\item{unit}{output currency unit based on the convertGDP function from the  GDPuc library}
 }
 \value{
-magpie object. in mio. USDMER05
+magpie object
 }
 \description{
 Calculates the value of production of individual livestock categories

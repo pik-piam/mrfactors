@@ -4,10 +4,13 @@
 \alias{calcVoPAFF}
 \title{calcVoPAFF}
 \usage{
-calcVoPAFF()
+calcVoPAFF(unit = "constant 2017 US$MER")
+}
+\arguments{
+\item{unit}{output currency unit based on the convertGDP function from the  GDPuc library}
 }
 \value{
-magpie object. in mio. 05USD MER units
+magpie object. in mio. USD
 }
 \description{
 Calculates the overall value of production of the agriculture,
