@@ -4,7 +4,7 @@
 #' @param datasource data source on which the labor costs should be based. Available are ILO, USDA (which also uses data
 #' on VoP from FAO), and GTAP.
 #' @param dataVersionILO If source is ILO, the version can be chosen. "" for the oldest version, or "monthYear" (e.g.
-#' "Aug23") for a newer version)
+#' "Aug24") for a newer version)
 #' @param subsectors boolean: should output be aggregated or split into available subsectors (crops, livst, forestry,
 #' fishery)
 #' @param inclFish boolean: should fish labor costs be included?
@@ -24,7 +24,7 @@
 #' @importFrom GDPuc convertGDP
 #' @importFrom stringr str_split
 
-calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsectors = TRUE, inclFish = FALSE,
+calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsectors = TRUE, inclFish = FALSE,
                            inclForest = FALSE, otherLivst = TRUE, gtapVar = "NVFA", addSubsidies = FALSE) {
 
   # get data from specified source
@@ -42,7 +42,7 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsect
     iloEmpl <- iloEmpl[, years, ]
     iloWeeklyHours <- iloWeeklyHours[, years, ]
 
-    # mean nominal hourly labor cost per employee in agriculture (US$05MER/h) based on USDA_FAO calculation
+    # mean nominal hourly labor cost per employee in agriculture (US$2017MER/h) based on USDA_FAO calculation
     # and regression based on ILO raw data
     iloLaborCosts <- calcOutput("HourlyLaborCosts", dataVersionILO = dataVersionILO, datasource = datasource,
                                 fillWithRegression = TRUE, projection = "SSP2", # scenario has no influence until 2020
@@ -50,18 +50,18 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsect
 
     # combine data sets to get total labor costs
     iloTotalHours <- 52.1429 * iloWeeklyHours[, , , drop = TRUE] * iloEmpl # mio. hours
-    out <- iloTotalHours * iloLaborCosts[, , , drop = TRUE] # mio. US$MER05
+    out <- iloTotalHours * iloLaborCosts[, , , drop = TRUE] # mio. US$MER2017
 
   } else if (datasource == "USDA") {
 
     if (isTRUE(inclForest)) stop("Forest labor costs not available for this datasource")
 
-    # Value of Production for livestock in US$MER2005 (including FAO livst categories not mapped to MAgPIE categories)
-    vopLivst <- calcOutput("VoPlivst", other = otherLivst, fillGaps = TRUE, aggregate = FALSE) # mio. US$MER05
+    # Value of Production for livestock in US$MER2017 (including FAO livst categories not mapped to MAgPIE categories)
+    vopLivst <- calcOutput("VoPlivst", other = otherLivst, fillGaps = TRUE, aggregate = FALSE) # mio. US$MER2017
     vopLivst <- setNames(dimSums(vopLivst, dim = 3), "Livestock")
 
-    # Value of Production for crops in US$MER2005
-    vopCrops <- calcOutput("VoPcrops", fillGaps = TRUE, aggregate = FALSE) # mio. US$MER05
+    # Value of Production for crops in US$MER2017
+    vopCrops <- calcOutput("VoPcrops", fillGaps = TRUE, aggregate = FALSE) # mio. US$MER2017
     vopCrops <- setNames(dimSums(vopCrops, dim = 3), "Crops")
 
     # no VoP data before 1991, data for 2019 incomplete (using fillGaps in calcVoP reduces years to 1991:2013 anyway)
@@ -180,9 +180,9 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsect
     # aggregate if subsectors == FALSE
     if (isFALSE(subsectors)) laborCosts <- dimSums(laborCosts, dim = 3)
 
-    # convert to USDMER05 (for countries missing the inflation factor, we assume no inflation)
+    # convert to USDMER2017 (for countries missing the inflation factor, we assume no inflation)
     out <- convertGDP(laborCosts, unit_in = "current US$MER",
-                      unit_out = "constant 2005 US$MER", replace_NAs = "no_conversion")
+                      unit_out = "constant 2017 US$MER", replace_NAs = "no_conversion")
 
   } else {
     stop("Data source not available")
@@ -190,6 +190,6 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsect
 
   return(list(x = out,
               weight = NULL,
-              unit = "mio. USD05MER",
+              unit = "mio. USD2017MER",
               description = "labor costs in agriculture"))
 }

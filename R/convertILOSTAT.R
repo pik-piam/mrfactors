@@ -14,23 +14,22 @@ convertILOSTAT <- function(x) {
 
   # transform currencies if applicable
   if ("currency" %in% getSets(x)) {
-    x[, , "2017 PPP $"] <- convertGDP(
-      x[, , "2017 PPP $"],
-      unit_in = "constant 2017 Int$PPP",
-      unit_out = "constant 2005 Int$PPP",
-      replace_NAs = c("linear", "no_conversion")
-    )
-    x[, , "US dollars"] <- convertGDP(
-      x[, , "US dollars"],
-      unit_in = "current US$MER",
-      unit_out = "constant 2005 US$MER",
-      replace_NAs = c("linear", "no_conversion")
-    )
+    if ("2021 PPP $" %in% getNames(x, dim = "currency")) {
+      x[, , "2021 PPP $"] <- convertGDP(x[, , "2021 PPP $"],
+                                        unit_in = "constant 2021 Int$PPP",
+                                        unit_out = "constant 2017 Int$PPP",
+                                        replace_NAs = c("linear", "no_conversion"))
+    }
+
+    x[, , "US dollars"] <- convertGDP(x[, , "US dollars"],
+                                      unit_in = "current US$MER",
+                                      unit_out = paste("constant 2017 US$MER"),
+                                      replace_NAs = c("linear", "no_conversion"))
 
     # update unit description
     getNames(x, dim = "currency")[getNames(x, dim = "currency") == "Local currency"] <- "current LCU"
-    getNames(x, dim = "currency")[getNames(x, dim = "currency") == "2017 PPP $"] <- "US$PPP2005"
-    getNames(x, dim = "currency")[getNames(x, dim = "currency") == "US dollars"] <- "US$MER2005"
+    getNames(x, dim = "currency")[getNames(x, dim = "currency") == "2021 PPP $"] <- "US$PPP2017"
+    getNames(x, dim = "currency")[getNames(x, dim = "currency") == "US dollars"] <- "US$MER2017"
   }
 
   # set missing values to 0

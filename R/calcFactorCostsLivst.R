@@ -4,6 +4,7 @@
 #' to VoP from FAO)
 #' @param otherLivst boolean: should FAO livestock categories that can't be matched to MAgPIE categories (i.e. beeswax,
 #' wool, silkworms, and honey) be reported as "livst_other"?
+#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @author Debbora Leip
 #' @examples
@@ -12,11 +13,12 @@
 #' }
 #' @importFrom magclass setNames dimSums time_interpolate
 
-calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE) {
+calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit = "constant 2017 US$MER") {
 
   if (datasource == "USDA") {
     # Value of Production for livestock in US$MER2005 (including FAO livst categories not mapped to MAgPIE categories)
-    vopLivst <- calcOutput("VoPlivst", fillGaps = TRUE, aggregate = FALSE, other = otherLivst) # mio. US$MER05
+    vopLivst <- calcOutput("VoPlivst", fillGaps = TRUE, aggregate = FALSE, other = otherLivst,
+                           unit = "constant 2017 US$MER")
 
     # no VoP data before 1991, data for 2019 incomplete
     years <- setdiff(getYears(vopLivst, as.integer = TRUE), c(1960:1990, 2019))
@@ -54,9 +56,18 @@ calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE) {
   } else {
     stop("Datasource not available")
   }
-
+  
+  if(unit != "constant 2017 US$MER"){
+    out<-convertGDP(out,
+                         unit_in = "constant 2017 US$MER",
+                         unit_out = unit,
+                         replace_NAs = "no_conversion")  
+  }   
+  
+  units <- paste0("mio ", unit)
+  
   return(list(x = out,
               weight = NULL,
-              unit = "mio. USD05MER",
+              unit = units,
               description = "Factor costs for livestock production"))
 }

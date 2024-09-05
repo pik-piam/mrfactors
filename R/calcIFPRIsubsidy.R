@@ -2,7 +2,7 @@
 #' @description Adds non-allocated subsidies to crop subsidies (as most subsidies are linked to land area), and
 #' excludes NRP subsidies (as those are border measures, which are already reflected in ag. prices)
 #' @param fillGaps boolean, should gaps in the dataset be filled using interpolation?
-#' @return magpie object. in mio. USDMER05
+#' @return magpie object. in mio. USD
 #' @author Debbora Leip
 #'
 #' @seealso [calcOutput()]
@@ -35,6 +35,6 @@ calcIFPRIsubsidy <- function(fillGaps = TRUE) {
 
   return(list(x = subsidies,
               weight = NULL,
-              unit = "mio. USDMER05",
+              unit = "mio. USDMER2017",
               description = "Agricultural subsidies"))
 }

@@ -56,7 +56,7 @@ calcRegFactorShare <- function(datasource = "USDA", factor = "cap") {
     usdaShares <- usdaShares / dimSums(usdaShares, dim = 3)
 
     # GDP (US$PPP) per capita as independent variable
-    gdp <- calcOutput("GDPpc", naming = "scenario", aggregate = FALSE)[, , "SSP2"]
+    gdp <- calcOutput("GDPpc", unit = "constant 2017 Int$PPP", naming = "scenario", aggregate = FALSE)[, , "SSP2"]
     country <- intersect(getCells(gdp), unique(mapping$ISO))
     mapping2 <- mapping[mapping$ISO %in% country, ]
     years <- intersect(getYears(gdp), getYears(weight))

@@ -2,7 +2,8 @@
 #' @description Calculates the overall value of production of the agriculture,
 #' forestry and fisheries sectors. Forestry and Fisheries are calculated from exports values.
 #'
-#' @return magpie object. in mio. 05USD MER units
+#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
+#' @return magpie object. in mio. USD
 #' @author Edna J. Molina Bacca, Debbora Leip
 #' @importFrom dplyr intersect
 #' @importFrom magclass dimSums
@@ -14,11 +15,11 @@
 #' a <- calcOutput("VoPAFF")
 #' }
 #'
-calcVoPAFF <- function() {
+calcVoPAFF <- function(unit = "constant 2017 US$MER") {
 
 #### Value of production for Agriculture (crops and livestock)
-  vopCrops <- calcOutput("VoPcrops", aggregate = FALSE)
-  vopLivst <- calcOutput("VoPlivst", other = TRUE, aggregate = FALSE)
+  vopCrops <- calcOutput("VoPcrops", aggregate = FALSE, unit = unit)
+  vopLivst <- calcOutput("VoPlivst", other = TRUE, aggregate = FALSE, unit = unit)
 
   vopAg <- setNames(dimSums(vopCrops, dim = 3) + dimSums(vopLivst, dim = 3), "Agriculture")
 
@@ -46,7 +47,7 @@ calcVoPAFF <- function() {
              prodFishTonNet[cellsFish, yearsFish, ] / 1000  # mio. current USD
   vopFish <- convertGDP(vopFish,
                          unit_in = "current US$MER",
-                         unit_out = "constant 2005 US$MER",
+                         unit_out = unit,
                          replace_NAs = "no_conversion")
 
   vopFish[!is.finite(vopFish)] <- 0
@@ -67,7 +68,7 @@ calcVoPAFF <- function() {
   # Base year change for exports value
   priceForestry <- convertGDP(priceForestry,
                                unit_in = "current US$MER",
-                               unit_out = "constant 2005 US$MER",
+                               unit_out = unit,
                                replace_NAs = "no_conversion")
 
   priceForestry[!is.finite(priceForestry)] <- 0
@@ -76,7 +77,7 @@ calcVoPAFF <- function() {
   years <- intersect(getYears(priceForestry), getYears(vopForestryData))
 
   vopForestry <- toolCountryFill(x = vopForestryData[, years, "Roundwood.Production_(m3)"] *
-                                    priceForestry[, years, ], fill = 0) # mio. constant 2005 US$MER
+                                    priceForestry[, years, ], fill = 0)
   getNames(vopForestry) <- "Forestry"
 
 ################
@@ -89,10 +90,11 @@ calcVoPAFF <- function() {
              vopForestry[cellsVoP, yearsVoP, ])
   x[!is.finite(x)] <- 0
 
-
+  units <- paste0("mio ", unit)
+  
   return(list(x = x,
          weight = NULL,
          mixed_aggregation = NULL,
-         unit = "mio. 05USDmer units",
+         unit = units,
          description = " Value of production for the agriculture, forestry and fisheries sector"))
 }
