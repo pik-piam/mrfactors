@@ -52,7 +52,8 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
       weight <- hourlyCosts
       weight[weight != 0] <- 1
 
-      hourlyCosts <- toolAggregate(hourlyCosts, rel = mapping, weight = weight, from = "from", to = "to", dim = 3.1)
+      hourlyCosts <- toolAggregate(hourlyCosts, rel = mapping, weight = weight, from = "from",
+                                   to = "to", dim = 3.1, zeroWeight = "allow")
 
       # aggregate the two revisions
       mapping <- data.frame(from = c("Agriculture, forestry and fishing",
@@ -61,7 +62,8 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
                                    "Agriculture, forestry and fishing"))
       weight <- hourlyCosts
       weight[weight != 0] <- 1
-      hourlyCosts <- toolAggregate(hourlyCosts, rel = mapping, weight = weight, from = "from", to = "to", dim = 3.1)
+      hourlyCosts <- toolAggregate(hourlyCosts, rel = mapping, weight = weight, from = "from",
+                                   to = "to", dim = 3.1, zeroWeight = "allow")
 
       # add data for India for 2000-2017 (except 2006), based on data from the Commission of Agricultural Costs and
       # Prices (https://cacp.dacnet.nic.in/)
