@@ -21,7 +21,7 @@ or as aggregate?}
 \item{extrapolate}{boolean: should values be extrapolate (by keeping constant) until 2150?}
 }
 \value{
-magpie object. in mio. USDMER05
+magpie object. in mio. USD
 }
 \description{
 Calculates factor costs that should affect agricultural employment but are not included in MAgPIE

@@ -6,7 +6,7 @@
 \usage{
 calcRegressionsILO(
   subtype = "AgEmplShare",
-  dataVersionILO = "Aug23",
+  dataVersionILO = "Aug24",
   thresholdWage = 0.1,
   forceWageIntercept = TRUE,
   wageRegrType = NULL,
@@ -20,7 +20,7 @@ share of people employed in agriculture (out of total population) and the log (b
 agriculture and GDP pc MER05.}
 
 \item{dataVersionILO}{which version of the ILO input data and regression to use. "" for the oldest version and
-old regression, or "monthYear" (e.g. "Aug23") for newer data with the new regression type}
+old regression, or "monthYear" (e.g. "Aug24") for newer data with the new regression type}
 
 \item{thresholdWage}{only relevant for linear hourly labor cost regression: for low GDP pc MER, the regression
 between hourly labor costs and GDP pc MER can lead to unreasonably low or even negative hourly labor costs.

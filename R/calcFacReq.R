@@ -52,8 +52,8 @@ calcFacReq <- function(splitSectors = FALSE) {
   }
 
   return(list(x = facReq,
-              unit = "USD05MER per tDM",
+              unit = "USD2017MER per tDM",
               weight = weight,
-              description = "Factor requirements for different crops (USD05MER per tDM) at regional level",
+              description = "Factor requirements for different crops at regional level",
               isocountries = FALSE))
 }

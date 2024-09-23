@@ -4,10 +4,12 @@
 \alias{calcProductionCosts}
 \title{calcProductionCosts}
 \usage{
-calcProductionCosts(datasource = "Vittis")
+calcProductionCosts(datasource = "Vittis", unit = "constant 2017 US$MER")
 }
 \arguments{
 \item{datasource}{Datasource of production costs, currently only "Vittis"}
+
+\item{unit}{output currency unit based on the convertGDP function from the  GDPuc library}
 }
 \value{
 List of magpie objects with results on country level, weight on country level, unit and description.

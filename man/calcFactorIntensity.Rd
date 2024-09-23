@@ -4,7 +4,11 @@
 \alias{calcFactorIntensity}
 \title{calcFactorIntensity}
 \usage{
-calcFactorIntensity(output = "intensities", method = "USDA")
+calcFactorIntensity(
+  output = "intensities",
+  method = "USDA",
+  unit = "constant 2017 US$MER"
+)
 }
 \arguments{
 \item{output}{needed outputs. It can be either "intensities" (Capital/Labour factor intensities),
@@ -12,14 +16,16 @@ calcFactorIntensity(output = "intensities", method = "USDA")
 For the "CapitalStock" method only "intensities" and "requirements" outputs supported.}
 
 \item{method}{"USDA" or "CapitalStock"}
+
+\item{unit}{output currency unit based on the convertGDP function from the  GDPuc library}
 }
 \value{
-magpie object of the factor requirements intensity or factor intensity in 05USDppp/tDM per crop,
+magpie object of the factor requirements intensity or factor intensity in USD/tDM per crop,
 or capital share fraction.
 }
 \description{
 Calculates factor intensity for labour and/or capital from USDA (Inputs share)
-and FAO (Value of Production)in 05USDppp per ton.
+and FAO (Value of Production).
 Capital intensity and requirements can also be calculated from FAO's CapitalStock database.
 }
 \examples{

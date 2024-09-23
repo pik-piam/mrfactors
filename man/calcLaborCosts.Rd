@@ -6,7 +6,7 @@
 \usage{
 calcLaborCosts(
   datasource = "ILO",
-  dataVersionILO = "Aug23",
+  dataVersionILO = "Aug24",
   subsectors = TRUE,
   inclFish = FALSE,
   inclForest = FALSE,
@@ -20,7 +20,7 @@ calcLaborCosts(
 on VoP from FAO), and GTAP.}
 
 \item{dataVersionILO}{If source is ILO, the version can be chosen. "" for the oldest version, or "monthYear" (e.g.
-"Aug23") for a newer version)}
+"Aug24") for a newer version)}
 
 \item{subsectors}{boolean: should output be aggregated or split into available subsectors (crops, livst, forestry,
 fishery)}
