@@ -4,7 +4,7 @@
 #' of the factor requirements using USDA
 #'
 #' @return MAgPIE object
-#' @author Edna J. Molina Bacca
+#' @author Edna J. Molina Bacca, Debbora Leip
 #' @seealso [calcAgCapLabourShare()]
 #'
 #' @examples

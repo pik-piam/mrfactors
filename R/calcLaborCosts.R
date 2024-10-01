@@ -113,11 +113,11 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug23", subsect
     # assume livestock labor cost share for fish
     if (isTRUE(inclFish)) shares <- mbind(shares, setNames(sharesLivst, "Fisheries"))
 
-    # for REF in 1990 no country has a value, so toolFillWithRegionAvg assigns NA. Use values from 1995 instead:
-    if ("y1990" %in% y) { # subsidy data starts only in 2005
-      ref <- h12$CountryCode[h12$RegionCode == "REF"]
-      shares[ref, 1990, ]  <- shares[ref, 1995, ]
-    }
+    # # for REF in 1990 no country has a value, so toolFillWithRegionAvg assigns NA. Use values from 1995 instead:
+    # if ("y1990" %in% y) { # subsidy data starts only in 2005
+    #   ref <- h12$CountryCode[h12$RegionCode == "REF"]
+    #   shares[ref, 1990, ]  <- shares[ref, 1995, ]
+    # }
 
     # interpolate between the five-year-steps
     shares <- time_interpolate(shares,
