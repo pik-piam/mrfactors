@@ -37,6 +37,6 @@ calcFacReqGLO <- function() {
 
   return(list(x = x,
               weight = NULL,
-              unit = "USD05MER per tDM",
-              description = "Factor requirements for different crops (USD05MER per tDM) at global level"))
+              unit = "USD2017MER per tDM",
+              description = "Factor requirements for different crops at global level"))
 }

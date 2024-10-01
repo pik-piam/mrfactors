@@ -15,7 +15,7 @@ A MAgPIE object containing national-scale costs of production for
 }
 \description{
 Aggregate production costs from Vittis dataset to MAgPIE crop
-categories and change unit from US$2000 to US$2005.
+categories and change unit from USD PPP 2000 to USD MER 2017.
 }
 \author{
 Debbora Leip

@@ -10,7 +10,7 @@ calcIFPRIsubsidy(fillGaps = TRUE)
 \item{fillGaps}{boolean, should gaps in the dataset be filled using interpolation?}
 }
 \value{
-magpie object. in mio. USDMER05
+magpie object. in mio. USD
 }
 \description{
 Adds non-allocated subsidies to crop subsidies (as most subsidies are linked to land area), and

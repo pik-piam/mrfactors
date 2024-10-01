@@ -9,7 +9,8 @@
 #' "requirements" (Capital Stock requirements per ton), and "CapitalShare" for "USDA" method.
 #' For the "CapitalStock" method only "intensities" and "requirements" outputs supported.
 #' @param method "USDA" or "CapitalStock"
-#' @return magpie object of the factor requirements intensity or factor intensity in 05USDppp/tDM per crop,
+#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
+#' @return magpie object of the factor requirements intensity or factor intensity in USD/tDM per crop,
 #' or capital share fraction.
 #' @author Edna J. Molina Bacca
 #' @importFrom luscale speed_aggregate
@@ -21,7 +22,7 @@
 #' a <- calcOutput("FactorIntensity")
 #' }
 #'
-calcFactorIntensity <- function(output = "intensities", method = "USDA") {
+calcFactorIntensity <- function(output = "intensities", method = "USDA", unit = "constant 2017 US$MER") {
 
 
   if (method == "USDA") { # using USDA method
@@ -29,7 +30,7 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA") {
     # Production of crops. mio. ton
     cropProdDMall  <- collapseDim(calcOutput("Production", products = "kcr", aggregate = FALSE, attributes = "dm"))
 
-    vopCrops <- calcOutput("VoPcrops", aggregate = FALSE) # mio. 05USD MER
+      vopCrops <- calcOutput("VoPcrops", aggregate = FALSE, unit = "constant 2017 US$MER")
 
     gnames <- intersect(getNames(vopCrops), getNames(cropProdDMall))
     gyears <- intersect(getYears(vopCrops), getYears(cropProdDMall))
@@ -70,19 +71,19 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA") {
 
   } else if (method == "CapitalStock" && output %in% c("intensities", "requirements")) {
 
-    # Fraction of each crop on overall Value of Production (Agriculture, Forestry and Fisheries)
-    vopCrops <- calcOutput("VoPcrops", aggregate = FALSE)
-    vopAff <- dimSums(calcOutput("VoPAFF", aggregate = FALSE), dim = 3)
-    years <- intersect(getYears(vopCrops), getYears(vopAff))
-    fractionVoPcrop <- vopCrops[, years, ] / vopAff[, years, ]
-    fractionVoPcrop[!is.finite(fractionVoPcrop)] <- 0
+          # Fraction of each crop on overall Value of Production (Agriculture, Forestry and Fisheries)
+          vopCrops <- calcOutput("VoPcrops", aggregate = FALSE, unit = unit)
+          vopAff <- dimSums(calcOutput("VoPAFF", aggregate = FALSE, unit = unit), dim = 3)
+          years <- intersect(getYears(vopCrops), getYears(vopAff))
+          fractionVoPcrop <- vopCrops[, years, ] / vopAff[, years, ]
+          fractionVoPcrop[!is.finite(fractionVoPcrop)] <- 0
 
-    # Existing capital stocks
-    name <- "22034|Net Capital Stocks (Agriculture, Forestry and Fishing).Value_USD_2015_prices_(millions)"
-    capitalStocks <- readSource("FAO_online", "CapitalStock", convert = TRUE)[, , name]
-    capitalStocks <- convertGDP(capitalStocks, unit_in = "current US$MER",
-                                                unit_out = "constant 2005 US$MER",
-                                                replace_NAs = "no_conversion")
+          # Existing capital stocks
+          name <- "22034|Net Capital Stocks (Agriculture, Forestry and Fishing).Value_USD_2015_prices_(millions)"
+          capitalStocks <- readSource("FAO_online", "CapitalStock", convert = TRUE)[, , name]
+          capitalStocks <- convertGDP(capitalStocks, unit_in = "constant 2015 US$MER",
+                                                     unit_out = "constant 2017 US$MER",
+                                                     replace_NAs = "no_conversion")
 
     years <- intersect(getYears(fractionVoPcrop), getYears(capitalStocks))
     region <- intersect(getCells(fractionVoPcrop), getCells(capitalStocks))
@@ -125,14 +126,20 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA") {
     stop("Method or output not supported")
   }
 
-  units <-
-  if (output %in% c("intensities", "requirements")) "05USDMER/tDM" else if (output == "CapitalShare") "fraction"
+   units <-
+   if (output %in% c("intensities", "requirements")) paste0("mio ", unit) else if (output == "CapitalShare") "fraction"
+   
+   if(unit != "constant 2017 US$MER" & output %in% c("intensities", "requirements")){
+     x <- convertGDP(x,
+                  unit_in = "constant 2017 US$MER",
+                  unit_out = unit,
+                  replace_NAs = "no_conversion")  
+   }   
 
-
-  return(list(x = x,
-              weight = weight,
-              mixed_aggregation = NULL,
-              unit = units,
-              description = "Factor Intensities or capital requirements for different
-                          crops in USD05 per ton or fraction"))
+   return(list(x = x,
+               weight = weight,
+               mixed_aggregation = NULL,
+               unit = units,
+               description = "Factor Intensities or capital requirements for different
+                            crops"))
 }
