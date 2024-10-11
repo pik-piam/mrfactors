@@ -33,7 +33,7 @@ calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALS
   subtype <- ifelse(dataVersionILO == "", "AgEmplShare", paste("AgEmplShare", dataVersionILO, sep = "_"))
   regCoeff <- readSource("RegressionsILO", subtype)
 
-  gdpPPPpc <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2017 Int$PPP", aggregate = FALSE)
+  gdpPPPpc <- calcOutput("GDPpcPast", unit = "constant 2017 Int$PPP", aggregate = FALSE)
 
   estShare <- (regCoeff[, , "slope", drop = TRUE] * log10(gdpPPPpc) + regCoeff[, , "intercept", drop = TRUE]) ** 2
   const <- (regCoeff[, , "slope"] * log10(regCoeff[, , "threshold"]) + regCoeff[, , "intercept"]) ** 2
