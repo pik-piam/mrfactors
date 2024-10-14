@@ -17,7 +17,7 @@ For the "CapitalStock" method only "intensities" and "requirements" outputs supp
 
 \item{method}{"USDA" or "CapitalStock"}
 
-\item{unit}{output currency unit based on the convertGDP function from the  GDPuc library}
+\item{unit}{output currency unit based on the toolConvertGDP function from the  GDPuc library}
 }
 \value{
 magpie object of the factor requirements intensity or factor intensity in USD/tDM per crop,

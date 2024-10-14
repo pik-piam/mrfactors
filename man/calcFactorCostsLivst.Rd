@@ -17,7 +17,7 @@ to VoP from FAO)}
 \item{otherLivst}{boolean: should FAO livestock categories that can't be matched to MAgPIE categories (i.e. beeswax,
 wool, silkworms, and honey) be reported as "livst_other"?}
 
-\item{unit}{output currency unit based on the convertGDP function from the  GDPuc library}
+\item{unit}{output currency unit based on the toolConvertGDP function from the  GDPuc library}
 }
 \value{
 List of magpie objects with results on country level, weight on country level, unit and description.

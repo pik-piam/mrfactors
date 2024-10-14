@@ -18,15 +18,15 @@ convertVittis <- function(x) {
   x <- toolAggregate(x, mapping, weight = weights, from = "Vittis", to = "kcr", dim = 3.2)
 
   # Convert from "constant 2000 Int$PPP" to "constant 2017 US$MER"
-  x <- GDPuc::convertGDP(x, "constant 2000 Int$PPP", "constant 2017 US$MER", replace_NAs = c("linear", 0))
+  x <- GDPuc::toolConvertGDP(x, "constant 2000 Int$PPP", "constant 2017 US$MER", replace_NAs = c("linear", 0))
 
   # fill missing countries with average over corresponding world region
   mapping <- toolGetMapping("regionmappingH12.csv", type = "regional", where = "mappingfolder")
   avgCosts <- toolAggregate(x,
-                             rel = mapping[mapping[, 2] %in% getItems(x, dim = 1), ],
-                             from = "CountryCode",
-                             to = "RegionCode",
-                             weight = new.magpie(getItems(x, dim = 1), getYears(x), getNames(x), 1))
+                            rel = mapping[mapping[, 2] %in% getItems(x, dim = 1), ],
+                            from = "CountryCode",
+                            to = "RegionCode",
+                            weight = new.magpie(getItems(x, dim = 1), getYears(x), getNames(x), 1))
   missingCountries <- setdiff(mapping[, 2], getItems(x, dim = 1))
 
   x <- toolCountryFill(x, verbosity = 2)

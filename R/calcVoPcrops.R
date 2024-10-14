@@ -3,11 +3,11 @@
 #' its fraction compared to overall Value of Production (Agriculture,Fish,Forestry).
 #'
 #' @param fillGaps boolean: should gaps be filled using production * prices (where production data is available)?
-#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
+#' @param unit output currency unit based on the toolConvertGDP function from the  GDPuc library
 #' @return magpie object. in mio. USD or fraction
 #' @author Edna J. Molina Bacca, Debbora Leip
 #' @importFrom dplyr intersect
-#' @importFrom GDPuc convertGDP
+#' @importFrom GDPuc toolConvertGDP
 #' @importFrom magpiesets findset
 #'
 #' @seealso [calcOutput()]
@@ -42,7 +42,7 @@ calcVoPcrops <- function(fillGaps = TRUE, unit = "constant 2017 US$MER") {
     vopKcrAggregated <- add_columns(vopKcrAggregated, setdiff(kcr, getNames(vopKcrAggregated)), dim = 3, fill = 0)
 
     production <- collapseDim(calcOutput("Production", products = "kcr", attributes = "dm", aggregate = FALSE))
-    prices <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO", aggregate = FALSE, 
+    prices <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO", aggregate = FALSE,
                                      unit = "constant 2017 US$MER"))
 
     kPrices <- intersect(kcr, getNames(prices))
@@ -50,7 +50,7 @@ calcVoPcrops <- function(fillGaps = TRUE, unit = "constant 2017 US$MER") {
 
     # fill with region averages where possible
     pricesRegional <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO",
-                                             aggregate = TRUE, regionmapping = "regionmappingH12.csv", 
+                                             aggregate = TRUE, regionmapping = "regionmappingH12.csv",
                                              unit = "constant 2017 US$MER"))
     pricesRegional <- toolAggregate(pricesRegional,
                                     rel = toolGetMapping("regionmappingH12.csv", where = "mappingfolder",
@@ -59,7 +59,7 @@ calcVoPcrops <- function(fillGaps = TRUE, unit = "constant 2017 US$MER") {
     prices[prices == 0] <- pricesRegional[prices == 0]
 
     # fill remaining gaps with global averages
-    pricesGLO <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO", aggregate = "GLO", 
+    pricesGLO <- collapseDim(calcOutput(type = "PriceAgriculture", datasource = "FAO", aggregate = "GLO",
                                         unit = "constant 2017 US$MER"))[, , kPrices]
     pricesGLOfilledISO <- prices
     pricesGLOfilledISO[, , ] <- pricesGLO
@@ -94,16 +94,16 @@ calcVoPcrops <- function(fillGaps = TRUE, unit = "constant 2017 US$MER") {
 
 
   weight <- NULL
-  
-  if(unit != "constant 2017 US$MER"){
-    vopKcrAggregated <- convertGDP(vopKcrAggregated,
-                                   unit_in = "constant 2017 US$MER",
-                                   unit_out = unit,
-                                   replace_NAs = "no_conversion")  
-  }    
-  
 
-  units <- paste0("mio ",unit)
+  if (unit != "constant 2017 US$MER") {
+    vopKcrAggregated <- toolConvertGDP(vopKcrAggregated,
+                                       unit_in = "constant 2017 US$MER",
+                                       unit_out = unit,
+                                       replace_NAs = "no_conversion")
+  }
+
+
+  units <- paste0("mio ", unit)
 
   return(list(x = vopKcrAggregated,
               weight = weight,

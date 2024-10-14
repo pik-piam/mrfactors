@@ -12,7 +12,7 @@ silkworms, and honey) be reported as "livst_other"?}
 
 \item{fillGaps}{boolean: should gaps be filled using production * prices (where production data is available)?}
 
-\item{unit}{output currency unit based on the convertGDP function from the  GDPuc library}
+\item{unit}{output currency unit based on the toolConvertGDP function from the  GDPuc library}
 }
 \value{
 magpie object
