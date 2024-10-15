@@ -70,10 +70,10 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
       hourlyCostsIndia <- c(0.2063, 0.2080, 0.2015, 0.1970, 0.1936, 0.1964, 0.2014, 0.2350, 0.2520,
                             0.2672, 0.3097, 0.3336, 0.3568, 0.3795, 0.3903, 0.3956, 0.4008)
       hourlyCosts["IND", setdiff(2000:2017, 2006), ] <- hourlyCostsIndia
-      hourlyCosts["IND", , ] <- convertGDP(hourlyCosts["IND", , ],
-                                           unit_in = "constant 2005 US$MER",
-                                           unit_out = "constant 2017 US$MER",
-                                           replace_NAs = c("linear", "no_conversion"))
+      hourlyCosts["IND", , ] <- toolConvertGDP(hourlyCosts["IND", , ],
+                                               unit_in = "constant 2005 US$MER",
+                                               unit_out = "constant 2017 US$MER",
+                                               replace_NAs = c("linear", "no_conversion"))
 
       # add data for China, aggregated using production as weight (provided by Xiaoxi)
       hourlyCostsChina <- readSource("HourlyLaborCostsChina", convert = FALSE)
@@ -90,10 +90,10 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
 
       years <- intersect(getYears(hourlyCosts), getYears(hourlyCostsChina))
       hourlyCosts["CHN", years, ] <- hourlyCostsChina[, years, ]
-      hourlyCosts["CHN", , ] <- convertGDP(hourlyCosts["CHN", , ],
-                                           unit_in = "constant 2005 US$MER",
-                                           unit_out = "constant 2017 US$MER",
-                                           replace_NAs = c("linear", "no_conversion"))
+      hourlyCosts["CHN", , ] <- toolConvertGDP(hourlyCosts["CHN", , ],
+                                               unit_in = "constant 2005 US$MER",
+                                               unit_out = "constant 2017 US$MER",
+                                               replace_NAs = c("linear", "no_conversion"))
 
       # remove outliers
       hourlyCosts[hourlyCosts > 100] <- 0 # unreasonable high values

@@ -31,10 +31,10 @@ convertIFPRIsubsidy <- function(x) {
   x[is.na(x)] <- 0
 
   # convert to USDMER2017 (for years with missing conversion factors we assume no inflation)
-  x <- GDPuc::convertGDP(x,
-                         unit_in = "current US$MER",
-                         unit_out = "constant 2017 US$MER", replace_NAs = "no_conversion"
-  )
+  x <- GDPuc::toolConvertGDP(x,
+                             unit_in = "current US$MER",
+                             unit_out = "constant 2017 US$MER",
+                             replace_NAs = "no_conversion")
 
   return(x)
 }

@@ -33,11 +33,11 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24"
 
     if (subtype == "AgEmplShare") {
       description <- paste0("Regression coeffcients for sqrt(ag. empl. share) ~ log(GDP pc PPP, base = 10) ",
-                          "and a empl. share threshold")
+                            "and a empl. share threshold")
     } else if (subtype == "HourlyLaborCosts") {
       if (dataVersionILO == "") {
         description <- paste0("Regression coeffcients for hourly labor costs ~ GDP pc MER, ",
-                            "and a wage threshold")
+                              "and a wage threshold")
       } else {
         description <- "Regression coeffcients of pooled OLS for log(hourly labor costs) ~ log(GDP pc MER)"
       }
@@ -54,7 +54,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24"
     cat(paste0("Note: You are recalculating this regression. If this should be the new default regression you",
                " need to manually save the resulting regression coefficients in the source folder.")) 
     cat(paste0("Note: In case underlying data changed (agricultural employment from ILO, historic population,",
-                " or GDP pc PPP) you should double check the resulting regression."))
+               " or GDP pc PPP) you should double check the resulting regression."))
     description <- paste0("Regression coeffcients for sqrt(ag. empl. share) ~ log(GDP pc PPP, base = 10) ",
                           "and a empl. share threshold")
 
@@ -74,7 +74,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24"
     getNames(share) <- "share_empl_ag"
 
     # GDP per capita as independent variable (updated currency baseyear since Aug 24)
-    gdpPc <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2017 Int$PPP", aggregate = FALSE)
+    gdpPc <- calcOutput("GDPpcPast", unit = "constant 2017 Int$PPP", aggregate = FALSE)
 
     years <- intersect(getYears(share), getYears(gdpPc))
     gdpPc <- gdpPc[, years, ]
@@ -124,11 +124,11 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24"
 
     # original hourly labor costs dataset (ILO data + data for India + data for China)
     hourlyLaborCosts <- calcOutput("HourlyLaborCosts", datasource = "ILO", dataVersionILO = dataVersionILO,
-                                  fillWithRegression = FALSE, aggregate = FALSE)
+                                   fillWithRegression = FALSE, aggregate = FALSE)
     hourlyLaborCosts[hourlyLaborCosts == 0] <- NA
 
     ## GDP PER CAPITA IN US$MER AS DEPENDENT VARIABLE (updated currency baseyear since Aug 24)
-    gdpPcMER <- calcOutput("GDPpcPast", GDPpcPast = "WDI-MI", unit = "constant 2017 US$MER", aggregate = FALSE)
+    gdpPcMER <- calcOutput("GDPpcPast", unit = "constant 2017 US$MER", aggregate = FALSE)
 
     ## combining data
     years <- intersect(getItems(hourlyLaborCosts, dim = 2), getItems(gdpPcMER, dim = 2))
@@ -149,19 +149,20 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24"
 
     if (wageRegrType == "linear") {
       if (thresholdWage != 0.1) warning(paste0("You changed the wage threshold. This option was included ",
-                                              "for testing purposes. Might lead to inconsistencies with ",
-                                              "functions using the default regression (e.g. calcLaborCosts ",
-                                              "or calcValidHourlyLaborCosts)"))
+                                               "for testing purposes. Might lead to inconsistencies with ",
+                                               "functions using the default regression (e.g. calcLaborCosts ",
+                                               "or calcValidHourlyLaborCosts)"))
 
-      if (isFALSE(forceWageIntercept)) warning(paste0("You changed the wage intercept setting. This option was ",
-                                              "included for testing purposes. Might lead to inconsistencies with ",
-                                              "functions using the default regression (e.g. calcLaborCosts ",
-                                              "or calcValidHourlyLaborCosts)"))
+      if (isFALSE(forceWageIntercept)) {
+        warning(paste0("You changed the wage intercept setting. This option was ",
+                       "included for testing purposes. Might lead to inconsistencies with ",
+                       "functions using the default regression (e.g. calcLaborCosts ",
+                       "or calcValidHourlyLaborCosts)"))
+      }
 
       cat(paste0("Note: In case underlying data changed (hourly labor costs from ILO, ",
-                  "or GDP pc MER) you should double check the resulting regression."))
-      description <- paste0("Regression coeffcients for hourly labor costs ~ GDP pc MER, ",
-                          "and a wage threshold")
+                 "or GDP pc MER) you should double check the resulting regression."))
+      description <- paste0("Regression coeffcients for hourly labor costs ~ GDP pc MER, and a wage threshold")
 
       # calculate regression (no regr weight, as we only have few countries and India would get too much influence)
       if (isTRUE(forceWageIntercept)) {
@@ -176,14 +177,14 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24"
 
       # create magclass object
       regCoeffs <- new.magpie(cells_and_regions = "GLO", names = c("intercept", "slope", "threshold"),
-                                            fill = NA, sets = c("region", "year", "data"))
+                              fill = NA, sets = c("region", "year", "data"))
       regCoeffs[, , "slope"] <- slope
       regCoeffs[, , "intercept"] <- intercept
       regCoeffs[, , "threshold"] <- thresholdWage
     } else {
       description <- "Regression coeffcients of pooled OLS for log(hourly labor costs) ~ log(GDP pc MER)"
       cat(paste0("Note: In case underlying data changed (hourly labor costs from ILO, ",
-                  "or GDP pc MER) you should double check the resulting regression."))
+                 "or GDP pc MER) you should double check the resulting regression."))
 
       reg <- lm(log(LaborCosts) ~ log(gdpPcMER), data = data)
       intercept <- reg$coefficients["(Intercept)"]

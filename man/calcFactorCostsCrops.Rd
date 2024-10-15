@@ -10,7 +10,7 @@ calcFactorCostsCrops(datasource = "USDA", unit = "constant 2017 US$MER")
 \item{datasource}{only source available is "USDA" (calculates factor costs by applying factor cost share from USDA
 to VoP from FAO)}
 
-\item{unit}{output currency unit based on the convertGDP function from the  GDPuc library}
+\item{unit}{output currency unit based on the toolConvertGDP function from the  GDPuc library}
 }
 \value{
 List of magpie objects with results on country level, weight on country level, unit and description.

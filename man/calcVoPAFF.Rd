@@ -7,7 +7,7 @@
 calcVoPAFF(unit = "constant 2017 US$MER")
 }
 \arguments{
-\item{unit}{output currency unit based on the convertGDP function from the  GDPuc library}
+\item{unit}{output currency unit based on the toolConvertGDP function from the  GDPuc library}
 }
 \value{
 magpie object. in mio. USD

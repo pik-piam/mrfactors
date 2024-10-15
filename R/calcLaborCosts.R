@@ -21,7 +21,7 @@
 #' calcOutput("LaborCosts", datasource = "ILO")
 #' }
 #' @importFrom magclass setNames dimSums time_interpolate
-#' @importFrom GDPuc convertGDP
+#' @importFrom GDPuc toolConvertGDP
 #' @importFrom stringr str_split
 
 calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsectors = TRUE, inclFish = FALSE,
@@ -181,8 +181,8 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsect
     if (isFALSE(subsectors)) laborCosts <- dimSums(laborCosts, dim = 3)
 
     # convert to USDMER2017 (for countries missing the inflation factor, we assume no inflation)
-    out <- convertGDP(laborCosts, unit_in = "current US$MER",
-                      unit_out = "constant 2017 US$MER", replace_NAs = "no_conversion")
+    out <- toolConvertGDP(laborCosts, unit_in = "current US$MER",
+                          unit_out = "constant 2017 US$MER", replace_NAs = "no_conversion")
 
   } else {
     stop("Data source not available")

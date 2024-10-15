@@ -4,7 +4,7 @@
 #' to VoP from FAO)
 #' @param otherLivst boolean: should FAO livestock categories that can't be matched to MAgPIE categories (i.e. beeswax,
 #' wool, silkworms, and honey) be reported as "livst_other"?
-#' @param unit output currency unit based on the convertGDP function from the  GDPuc library
+#' @param unit output currency unit based on the toolConvertGDP function from the  GDPuc library
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @author Debbora Leip
 #' @examples
@@ -37,7 +37,7 @@ calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit =
     weight <- time_interpolate(weight, interpolated_year = setdiff(y, getItems(weight, dim = 2)),
                                extrapolation_type = "constant", integrate_interpolated_years = TRUE)[, y, ]
     shares <- toolFillWithRegionAvg(shares[, y, ], valueToReplace = 0, weight = weight,
-                                        regionmapping = h12, verbose = FALSE, warningThreshold = 1)
+                                    regionmapping = h12, verbose = FALSE, warningThreshold = 1)
 
     # for REF in 1990 no country has a value, so toolFillWithRegionAvg assigns NA. Use values from 1995 instead:
     if ("y1990" %in% y) { # subsidy data starts only in 2005
@@ -56,16 +56,16 @@ calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit =
   } else {
     stop("Datasource not available")
   }
-  
-  if(unit != "constant 2017 US$MER"){
-    out<-convertGDP(out,
-                         unit_in = "constant 2017 US$MER",
-                         unit_out = unit,
-                         replace_NAs = "no_conversion")  
-  }   
-  
+
+  if (unit != "constant 2017 US$MER") {
+    out <- toolConvertGDP(out,
+                          unit_in = "constant 2017 US$MER",
+                          unit_out = unit,
+                          replace_NAs = "no_conversion")
+  }
+
   units <- paste0("mio ", unit)
-  
+
   return(list(x = out,
               weight = NULL,
               unit = units,
