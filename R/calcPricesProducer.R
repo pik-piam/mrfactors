@@ -29,7 +29,7 @@ calcPricesProducer <- function(products = "kcr", calculation = "VoP", weighting 
 
       # weight: Production
       if (weighting == "production") {
-        mappingFAO <- toolGetMapping("FAO2LUH2MAG_croptypes.csv", type = "sectoral", where = "mrcommons")
+        mappingFAO <- toolGetMapping("FAO2LUH2MAG_croptypes.csv", type = "sectoral", where = "mrlandcore")
         itemsIntersect <- intersect(getNames(pricesProdFAO), unique(mappingFAO$ProductionItem))
         weightProd <- collapseNames(readSource("FAO_online", "Crop")[, , "production"])
         getNames(weightProd)[getNames(weightProd) == "254|Oil palm fruit"] <- "254|Oil, palm fruit"
