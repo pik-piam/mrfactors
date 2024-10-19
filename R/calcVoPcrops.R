@@ -25,7 +25,7 @@ calcVoPcrops <- function(fillGaps = TRUE, unit = "constant 2017 US$MER") {
   getNames(vopAll)[getNames(vopAll) == "254|Oil palm fruit"] <- "254|Oil, palm fruit"
 
   # items for aggregation
-  mappingFAO <- toolGetMapping("FAO2LUH2MAG_croptypes.csv", type = "sectoral", where = "mrcommons")
+  mappingFAO <- toolGetMapping("FAO2LUH2MAG_croptypes.csv", type = "sectoral", where = "mrlandcore")
   itemsIntersect <- intersect(getNames(vopAll), unique(mappingFAO$ProductionItem))
   mappingFAO <- mappingFAO[mappingFAO$ProductionItem %in% itemsIntersect, ]
 
