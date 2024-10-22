@@ -36,13 +36,15 @@ calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation =
     mapping <- toolGetMapping("caseStudiesUSDATFP.csv", where = "mrfactors", type = "regional")
 
     .cleanCaseStudy <- function(cs) {
-      countries <- mapping[mapping$CaseStudyUsed == cs, "ISO"]
+      countries <- mapping[mapping$CaseStudiesUsed == cs, "ISO"]
       tmp <- tfpShares[countries, , ]
       tmpArray <- as.array(tmp)[1, , ]
 
-      # remove casestudy if it has completely constant values (currently this is only SSA)
+      # special case where all years have the same values
+      # (currently only SSA for which estimates are over the period 1965-2008, we assign value last year, i.e. 2010)
       if (all(sweep(tmpArray, MARGIN = 2, STATS = tmpArray[1, ], FUN = "=="))) {
-        tmp[countries, , ] <- 0
+        years <- getYears(tmp)
+        tmp[countries, years[1:(length(years) - 1)], ] <- 0
         return(tmp)
       } 
 
@@ -77,7 +79,7 @@ calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation =
       return(tmp)
     }
 
-    caseStudies <- unique(mapping$CaseStudyUsed)
+    caseStudies <- unique(mapping$CaseStudiesUsed)
 
     tfpShares <- magpiesort(mbind(lapply(caseStudies, .cleanCaseStudy)))
 

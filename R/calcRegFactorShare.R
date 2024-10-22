@@ -8,6 +8,10 @@
 #' @author Debbora Leip, Edna J. Molina Bacca
 #' @seealso [calcOutput()],[calcFactorIntensity()]
 #' @param datasource Only USDA available
+#' @param caseStudies The case studies to be used for the regression (either CountryCaseStudies or
+#' CaseStudiesDirectMapping). Default is CountryCaseStudy, as including regional case studies weakens the direct
+#' link to GDP per capita (and results in a regression with non-normally distributed residuals).
+#' 
 #' @importFrom madrat calcOutput
 #' @importFrom magclass collapseDim dimSums getCells getYears
 #' @importFrom stats lm
@@ -17,7 +21,7 @@
 #' calcOutput("calcRegFactorShare")
 #' }
 #'
-calcRegFactorShare <- function(datasource = "USDA") {
+calcRegFactorShare <- function(datasource = "USDA", caseStudies = "CountryCaseStudies") {
 
   if (datasource == "USDA") {
     # raw USDA cost shares -- labor-capital ratio is the same for kcr and kli, as both are shared inputs
@@ -36,32 +40,37 @@ calcRegFactorShare <- function(datasource = "USDA") {
     gdp <- calcOutput("GDPpc", naming = "scenario", unit = "constant 2017 Int$PPP", aggregate = FALSE)[, , "SSP2"]
     gdp <- setNames(gdp, "GDP_pc")
 
-    # mapping 
-    mapping <- madrat::toolGetMapping("subsetCaseStudiesUSDATFP.csv", where = "mrfactors", type = "regional")
+    # mapping to case studies
+    mapping <- madrat::toolGetMapping("caseStudiesUSDATFP.csv", where = "mrfactors", type = "regional")
+    mapping <- mapping[, c("ISO", caseStudies)]
+    mapping <- mapping[complete.cases(mapping), ]
     countries <- unique(mapping$ISO)
 
     # aggregate shares using factor costs as weight
     capShare <- capShare[countries, , ]
     weight  <- facCosts[countries, getYears(capShare), ]
     weight[capShare == 0] <- 0
-    capShare <- toolAggregate(capShare, rel = mapping, weight = weight, from = "ISO", to = "CaseStudy", dim = 1)
+    weight <- weight + 1e-12
+    capShare <- toolAggregate(capShare, rel = mapping, weight = weight,
+                              from = "ISO", to = caseStudies, dim = 1)
 
     # aggregate GDP per capita using population as weight
     pop <- calcOutput("Population", naming = "scenario", aggregate = FALSE)[, , "SSP2"]
     weight2 <- pop[countries, getYears(capShare), ]
-    weight2[weight == 0] <- 0
-    gdp <- toolAggregate(gdp[countries, getYears(capShare), ], rel = mapping, weight = weight2,
-                         from = "ISO", to = "CaseStudy", dim = 1)
+    weight2[weight == 1e-12] <- 1e-12
+    gdp <- toolAggregate(gdp[countries, getYears(capShare), ], rel = mapping, 
+                         weight = weight2, from = "ISO", to = caseStudies, dim = 1)
 
     # aggregate factor costs as regression weight
-    weightRegr <- toolAggregate(facCosts[countries, getYears(capShare), ], rel = mapping, weight = NULL,
-                                from = "ISO", to = "CaseStudy", dim = 1)
+    weightRegr <- toolAggregate(facCosts[countries, getYears(capShare), ], rel = mapping,
+                                weight = NULL, from = "ISO", to = caseStudies, dim = 1)
 
     # combine data
     data <- mbind(capShare, gdp, weightRegr)
     data <- as.data.frame(data)[, 2:5]
     data <- reshape(data, idvar = c("Region", "Year"), timevar = "Data1", direction = "wide")
     colnames(data) <- c("Region", "Year", "CapitalShare", "GDP_pc", "FactorCosts")
+    data <- data[data$CapitalShare != 0, ]
 
 
     # regression

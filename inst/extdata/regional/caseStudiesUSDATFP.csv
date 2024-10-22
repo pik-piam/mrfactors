@@ -1,4 +1,4 @@
-"Country","Region","ISO","CaseStudyUsed","CaseStudyDirect","CountryCaseStudy"
+"Country","Region","ISO","CaseStudiesUsed","CaseStudiesDirectMapping","CountryCaseStudies"
 "Armenia","USSR","ARM","USSRasia","USSRasia","NA"
 "Afghanistan","ASIA","AFG","USSRasia","USSRasia","NA"
 "Albania","EUROPE","ALB","USSReurope","USSReurope","NA"
