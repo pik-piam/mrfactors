@@ -14,7 +14,7 @@
 #' @examples
 #' \dontrun{
 #' calcOutput("calcAgCapLabourShare")
-#' 
+#' }
 #' @importFrom madrat calcOutput
 #' @importFrom magclass collapseDim collapseNames dimSums getYears
 #'

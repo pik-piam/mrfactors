@@ -1,6 +1,6 @@
 #' @title calcFactorIntensity
 #' @description Calculates factor intensity in crop production for labour and/or capital from USDA (Inputs share)
-#' and FAO (Value of Production)in 05USDppp per ton.
+#' and FAO (Value of Production)in constant 2017 US$MER per ton.
 #' Capital intensity and requirements can also be calculated from FAO's CapitalStock database.
 #'
 #'

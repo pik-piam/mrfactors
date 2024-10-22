@@ -1,6 +1,6 @@
 #' @title calcVoPcrops
 #' @description Calculates the value of production of individual production items or
-#' its fraction compared to overall Value of Production (Agriculture,Fish,Forestry).
+#' its fraction compared to overall Value of Production (Agriculture, Fish, Forestry).
 #'
 #' @param fillGaps boolean: should gaps be filled using production * prices (where production data is available)?
 #' @param unit output currency unit based on the toolConvertGDP function from the  GDPuc library

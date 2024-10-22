@@ -9,7 +9,7 @@
 #' @seealso [calcOutput()],[calcFactorIntensity()]
 #' @param datasource Only USDA available
 #' @param caseStudies The case studies to be used for the regression (either CountryCaseStudies or
-#' CaseStudiesDirectMapping). Default is CountryCaseStudy, as including regional case studies weakens the direct
+#' CaseStudiesDirectMapping). Default is CountryCaseStudies, as including regional case studies weakens the direct
 #' link to GDP per capita (and results in a regression with non-normally distributed residuals).
 #' 
 #' @importFrom madrat calcOutput

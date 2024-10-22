@@ -16,7 +16,7 @@
 calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit = "constant 2017 US$MER") {
 
   if (datasource == "USDA") {
-    # Value of Production for livestock in US$MER2005 (including FAO livst categories not mapped to MAgPIE categories)
+    # Value of Production for livestock in US$MER2017 (including FAO livst categories not mapped to MAgPIE categories)
     vopLivst <- calcOutput("VoPlivst", fillGaps = TRUE, aggregate = FALSE, other = otherLivst,
                            unit = "constant 2017 US$MER")
 
@@ -24,7 +24,7 @@ calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit =
     years <- setdiff(getYears(vopLivst, as.integer = TRUE), c(1960:1990, 2019))
 
     # USDA labor cost shares
-    shares <- calcOutput("FractionInputsUSDA", products = "kli", aggregate = FALSE)
+    shares <- calcOutput("FractionInputsUSDA", products = "kli", aggregate = FALSE, keepConstantExtrapolation = TRUE)
     shares <- dimSums(shares[, , c("Labor", "Capital")], dim = 3)
 
     # closest 5-year step before and after start of VoP data needed for interpolation of shares
@@ -38,12 +38,6 @@ calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit =
                                extrapolation_type = "constant", integrate_interpolated_years = TRUE)[, y, ]
     shares <- toolFillWithRegionAvg(shares[, y, ], valueToReplace = 0, weight = weight,
                                     regionmapping = h12, verbose = FALSE, warningThreshold = 1)
-
-    # for REF in 1990 no country has a value, so toolFillWithRegionAvg assigns NA. Use values from 1995 instead:
-    if ("y1990" %in% y) { # subsidy data starts only in 2005
-      ref <- h12$CountryCode[h12$RegionCode == "REF"]
-      shares[ref, 1990, ]  <- shares[ref, 1995, ]
-    }
 
     # interpolate between the five-year-steps
     shares <- time_interpolate(shares,

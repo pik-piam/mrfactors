@@ -18,7 +18,7 @@ calcFacReqGLO <- function() {
 
   .Deprecated(paste0("calcOutput", "(\"FacReq\", aggregate = \"GLO\", years = 2005)"))
 
-  # Reads factor requirements in USD05ppp
+  # Reads factor requirements in constant 2017 US$MER
   factors <- dimSums(calcOutput("FactorIntensity", aggregate = FALSE, years = 2005), dim = 3.1)
 
   # Reads production as weight

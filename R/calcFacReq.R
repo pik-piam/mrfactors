@@ -1,6 +1,6 @@
 #' @title calcFacReq
 #'
-#' @description This function calculates factor requirement costs (05USDMER/tDM) on regional level,
+#' @description This function calculates factor requirement costs (constant 2017 US$MER/tDM) on regional level,
 #' based FAO databases
 #'
 #' @param splitSectors if TRUE requirements for labor and capital will be reported separately
