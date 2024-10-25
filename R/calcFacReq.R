@@ -18,7 +18,7 @@
 #'
 calcFacReq <- function(splitSectors = FALSE) {
 
-  # get factor requirements in US$PPP05
+  # get factor requirements in 2017 US$MER/tDM
   facReq <- calcOutput("FactorIntensity", aggregate = FALSE)
   facReq <- facReq[, where(facReq != 0)$true$years, ]
 

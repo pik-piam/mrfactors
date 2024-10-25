@@ -28,6 +28,11 @@ calcAgCapLabourShare <- function(fillWithRegression = TRUE, projection = FALSE) 
   fractionCapital <- shares[, , "Capital"] / (shares[, , "Labor", drop = TRUE] + shares[, , "Capital", drop = TRUE])
   fractionCapital[is.na(fractionCapital)] <- 0
 
+  # drop mexico case study due to unreasonably high capital share
+  mapping <- toolGetMapping("caseStudiesUSDATFP.csv", where = "mrfactors", type = "regional")
+  countries <- mapping$ISO[mapping$CaseStudiesUsed == "MEX"]
+  fractionCapital[countries, , ] <- 0
+
   # fill gaps with regression
   if (isTRUE(fillWithRegression)) {
 
@@ -46,7 +51,7 @@ calcAgCapLabourShare <- function(fillWithRegression = TRUE, projection = FALSE) 
     fractionCapital <- magpiesort(add_columns(fractionCapital, dim = 2, fill = 0,
                                               addnm = setdiff(getItems(gdp, dim = 2), 
                                                               getItems(fractionCapital, dim = 2))))
-    years <- getItems(fractionCapital, dim = 2)
+    years <- getYears(fractionCapital, as.integer = TRUE)
 
     .fillTimeseries <- function(var, country, regressor) {
       ctryEst <- regCoeff[, , "intercept", drop = TRUE] + regCoeff[, , "slope", drop = TRUE] * regressor[ctry, , ]
@@ -95,12 +100,6 @@ calcAgCapLabourShare <- function(fillWithRegression = TRUE, projection = FALSE) 
   weight <- time_interpolate(dataset = weight, interpolated_year = missingYears, 
                              integrate_interpolated_years = TRUE, extrapolation_type = "constant")
   weight <- weight[, getItems(fractionCapital, dim = 2), ]
-
-
-  # Give 0 weigh to countries with unexpectedly high capital shares
-  # countries with capital share > 0.7 "BHS" "BLZ" "CRI" "CUB" "DOM" "GTM" "GUF" "GUY" "HND" "HTI" "JAM" "MEX"
-  # "NIC" "PAN" "PRI" "SLV" "SUR" "TTO" "VEN" (all from Mexico case study)
-  weight[where(fractionCapital > 0.7)$true$regions, , ] <- 0
 
   weight[fractionCapital == 0] <- 0
   x <- setNames(fractionCapital, NULL)

@@ -41,10 +41,11 @@ calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation =
       tmpArray <- as.array(tmp)[1, , ]
 
       # special case where all years have the same values
-      # (currently only SSA for which estimates are over the period 1965-2008, we assign value last year, i.e. 2010)
+      # (currently only SSA where estimates are over the period 1965-2008, we assign value to middle of period, 1985)
       if (all(sweep(tmpArray, MARGIN = 2, STATS = tmpArray[1, ], FUN = "=="))) {
-        years <- getYears(tmp)
-        tmp[countries, years[1:(length(years) - 1)], ] <- 0
+        years <- getYears(tmp, as.integer = TRUE)
+        keep  <- round((min(years) + max(years))/2/5)*5
+        tmp[countries, setdiff(years, keep), ] <- 0
         return(tmp)
       } 
 
