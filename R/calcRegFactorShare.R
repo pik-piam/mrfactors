@@ -11,7 +11,7 @@
 #' @param caseStudies The case studies to be used for the regression (either CountryCaseStudies or
 #' CaseStudiesDirectMapping). Default is CountryCaseStudies, as including regional case studies weakens the direct
 #' link to GDP per capita (and results in a regression with non-normally distributed residuals).
-#' 
+#'
 #' @importFrom madrat calcOutput
 #' @importFrom magclass collapseDim dimSums getCells getYears
 #' @importFrom stats lm
@@ -32,8 +32,8 @@ calcRegFactorShare <- function(datasource = "USDA", caseStudies = "CountryCaseSt
 
     # factor costs as weight (keeping constant for missing years in the past)
     facCosts  <- setNames(dimSums(calcOutput("FactorCostsCrops", aggregate = FALSE), dim = 3) +
-                          dimSums(calcOutput("FactorCostsLivst", aggregate = FALSE), dim = 3), "FactorCosts")
-    facCosts  <- time_interpolate(facCosts, interpolated_year = seq(1960, 1990), 
+                            dimSums(calcOutput("FactorCostsLivst", aggregate = FALSE), dim = 3), "FactorCosts")
+    facCosts  <- time_interpolate(facCosts, interpolated_year = seq(1960, 1990),
                                   extrapolation_type = "constant", integrate_interpolated_years = TRUE)
 
     # dependent variable
@@ -43,7 +43,7 @@ calcRegFactorShare <- function(datasource = "USDA", caseStudies = "CountryCaseSt
     # mapping to case studies
     mapping <- madrat::toolGetMapping("caseStudiesUSDATFP.csv", where = "mrfactors", type = "regional")
     mapping <- mapping[, c("ISO", caseStudies)]
-    mapping <- mapping[complete.cases(mapping), ]
+    mapping <- mapping[!is.na(mapping[, caseStudies]), ]
     countries <- unique(mapping$ISO)
 
     # aggregate shares using factor costs as weight
@@ -58,7 +58,7 @@ calcRegFactorShare <- function(datasource = "USDA", caseStudies = "CountryCaseSt
     pop <- calcOutput("Population", naming = "scenario", aggregate = FALSE)[, , "SSP2"]
     weight2 <- pop[countries, getYears(capShare), ]
     weight2[weight == 1e-12] <- 1e-12
-    gdp <- toolAggregate(gdp[countries, getYears(capShare), ], rel = mapping, 
+    gdp <- toolAggregate(gdp[countries, getYears(capShare), ], rel = mapping,
                          weight = weight2, from = "ISO", to = caseStudies, dim = 1)
 
     # aggregate factor costs as regression weight
@@ -74,7 +74,7 @@ calcRegFactorShare <- function(datasource = "USDA", caseStudies = "CountryCaseSt
 
 
     # regression
-    fit <- lm(CapitalShare ~ log(GDP_pc, base = 10), data = data, weights = FactorCosts)
+    fit <- lm(CapitalShare ~ log(GDP_pc, base = 10), data = data, weights = data$FactorCosts)
 
     # create magclass object
     res <- new.magpie(names = c("slope", "intercept"), sets = c("Region", "Year", "coefficients"))

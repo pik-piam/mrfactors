@@ -10,7 +10,7 @@
 #' @author Debbora Leip
 #' @examples
 #' \dontrun{
-#' calcOutput("FactorCosts)
+#' calcOutput("FactorCosts")
 #' }
 #' @importFrom magclass setNames dimSums time_interpolate
 
@@ -25,13 +25,6 @@ calcFactorCosts <- function(datasource = "USDA", otherLivst = FALSE, subsectors 
 
   if (isFALSE(subsectors)) {
     factorCosts <- dimSums(factorCosts, dim = 3)
-  }
-
-  if (unit != "constant 2017 US$MER") {
-    factorCosts <- toolConvertGDP(factorCosts,
-                                  unit_in = "constant 2017 US$MER",
-                                  unit_out = unit,
-                                  replace_NAs = "no_conversion")
   }
 
   units <- paste0("mio ", unit)

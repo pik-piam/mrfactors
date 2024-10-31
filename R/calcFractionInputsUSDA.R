@@ -18,7 +18,7 @@
 #' }
 #'
 calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation = TRUE, interpolate = TRUE) {
-  
+
   # raw cost shares from USDA
   tfpShares <- readSource("TFPUSDA")
 
@@ -27,8 +27,8 @@ calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation =
     years <- getYears(tfpShares, as.integer = TRUE) + 5
     years <- years[years <= max(getYears(tfpShares, as.integer = TRUE))]
     tfpShares <- magpiesort(time_interpolate(tfpShares,
-                                            interpolated_year = years,
-                                            extrapolation_type = "constant", integrate_interpolated_years = TRUE))
+                                             interpolated_year = years,
+                                             extrapolation_type = "constant", integrate_interpolated_years = TRUE))
   }
 
   # remove constant extrapolation
@@ -44,10 +44,10 @@ calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation =
       # (currently only SSA where estimates are over the period 1965-2008, we assign value to middle of period, 1985)
       if (all(sweep(tmpArray, MARGIN = 2, STATS = tmpArray[1, ], FUN = "=="))) {
         years <- getYears(tmp, as.integer = TRUE)
-        keep  <- round((min(years) + max(years))/2/5)*5
+        keep  <- round((min(years) + max(years)) / 2 / 5) * 5
         tmp[countries, setdiff(years, keep), ] <- 0
         return(tmp)
-      } 
+      }
 
       removeYears <- c()
 
@@ -76,7 +76,7 @@ calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation =
       }
 
       if (length(removeYears) > 0) tmp[countries, removeYears, ] <- 0
-      
+
       return(tmp)
     }
 
@@ -95,15 +95,15 @@ calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation =
   tfpShares <- tfpShares[, years, ]
 
   # mio. USD VoP (constant 2014_2016 thousand US$ has values before 1991, current_thousand_US$ does not)
-  vopCrops <- voPAll[, ,  "2041|Crops.Gross_Production_Value_(constant_2014_2016_thousand_US$)_(1000_US$)"]/1000
-  vopLivst <- voPAll[, , "2044|Livestock.Gross_Production_Value_(constant_2014_2016_thousand_US$)_(1000_US$)"]/1000
+  vopCrops <- voPAll[, ,  "2041|Crops.Gross_Production_Value_(constant_2014_2016_thousand_US$)_(1000_US$)"] / 1000
+  vopLivst <- voPAll[, , "2044|Livestock.Gross_Production_Value_(constant_2014_2016_thousand_US$)_(1000_US$)"] / 1000
   ratio <- collapseDim(vopCrops / (vopCrops + vopLivst))
 
   # fill gaps in ratio with global average
   gloRatio <- dimSums(vopCrops, dim = 1) / (dimSums(vopCrops, dim = 1) + dimSums(vopLivst, dim = 1))
   for (y in getYears(ratio)) {
-   ratio[where(is.na(ratio[, y, ]))$true$regions, y, ] <- gloRatio[, y, ]
-  } 
+    ratio[where(is.na(ratio[, y, ]))$true$regions, y, ] <- gloRatio[, y, ]
+  }
 
   # split labor and machinery costs between crops and livestock
   sharedInput <- c("Machinery", "AG_Labour") # factors that convene livestock and crops production

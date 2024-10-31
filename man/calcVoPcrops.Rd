@@ -16,7 +16,7 @@ magpie object. in mio. USD or fraction
 }
 \description{
 Calculates the value of production of individual production items or
-its fraction compared to overall Value of Production (Agriculture,Fish,Forestry).
+its fraction compared to overall Value of Production (Agriculture, Fish, Forestry).
 }
 \examples{
 \dontrun{

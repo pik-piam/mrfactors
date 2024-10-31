@@ -1,7 +1,7 @@
 #' @title calcAgCapLabourShare
 #'
 #' @description This function calculates historical capital shares (Capital + Labour)
-#' of the factor requirements using USDA 
+#' of the factor requirements using USDA
 #'
 #' @param fillWithRegression boolean: should missing values be filled based on a regression between capital share
 #' and GDPpcPPP (calibrated to countries)
@@ -21,7 +21,7 @@
 calcAgCapLabourShare <- function(fillWithRegression = TRUE, projection = FALSE) {
   # raw USDA cost shares -- labor-capital ratio is the same for kcr and kli, as both are shared inputs
   # We use kcr here, but use full factor costs (crops + livst) as aggregation weight below
-  shares <- calcOutput("FractionInputsUSDA", products = "kcr", aggregate = FALSE, 
+  shares <- calcOutput("FractionInputsUSDA", products = "kcr", aggregate = FALSE,
                        keepConstantExtrapolation = FALSE, interpolate = TRUE)
 
   # Determines fraction between capital and labour
@@ -49,7 +49,7 @@ calcAgCapLabourShare <- function(fillWithRegression = TRUE, projection = FALSE) 
 
     # add years with GDP data to hourlyCosts object
     fractionCapital <- magpiesort(add_columns(fractionCapital, dim = 2, fill = 0,
-                                              addnm = setdiff(getItems(gdp, dim = 2), 
+                                              addnm = setdiff(getItems(gdp, dim = 2),
                                                               getItems(fractionCapital, dim = 2))))
     years <- getYears(fractionCapital, as.integer = TRUE)
 
@@ -97,7 +97,7 @@ calcAgCapLabourShare <- function(fillWithRegression = TRUE, projection = FALSE) 
 
   # keep weight constant for missing years in the past and projection
   missingYears <- setdiff(getYears(fractionCapital, as.integer = TRUE), getYears(weight, as.integer = TRUE))
-  weight <- time_interpolate(dataset = weight, interpolated_year = missingYears, 
+  weight <- time_interpolate(dataset = weight, interpolated_year = missingYears,
                              integrate_interpolated_years = TRUE, extrapolation_type = "constant")
   weight <- weight[, getItems(fractionCapital, dim = 2), ]
 
