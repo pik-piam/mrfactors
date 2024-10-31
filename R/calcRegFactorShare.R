@@ -88,6 +88,6 @@ calcRegFactorShare <- function(datasource = "USDA", caseStudies = "CountryCaseSt
   return(list(x = res,
               weight = NULL,
               unit = "Share",
-              description = paste("Regression parameters for factor share (capital or labour) calculation",
+              description = paste("Regression parameters for capital share out of factor requirements (capital+labor) ",
                                   "based on log10(GDPpc)")))
 }

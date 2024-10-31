@@ -130,6 +130,7 @@ calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation =
   weight <- tfpShares
   weight[, , ] <- vop[, getYears(tfpShares), ]
   weight[tfpShares == 0] <- 0
+  weight <- weight + 1e-20
 
   return(list(x = tfpShares,
               weight = weight,

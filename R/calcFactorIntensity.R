@@ -142,6 +142,8 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA", unit = 
                         replace_NAs = "no_conversion")
   }
 
+  weight <- weight + 1e-20
+
   return(list(x = x,
               weight = weight,
               mixed_aggregation = NULL,
