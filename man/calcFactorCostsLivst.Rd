@@ -7,6 +7,7 @@
 calcFactorCostsLivst(
   datasource = "USDA",
   otherLivst = FALSE,
+  inclFish = FALSE,
   unit = "constant 2017 US$MER"
 )
 }
@@ -16,6 +17,8 @@ to VoP from FAO)}
 
 \item{otherLivst}{boolean: should FAO livestock categories that can't be matched to MAgPIE categories (i.e. beeswax,
 wool, silkworms, and honey) be reported as "livst_other"?}
+
+\item{inclFish}{boolean: should fish factor costs be included?}
 
 \item{unit}{output currency unit based on the toolConvertGDP function from the  GDPuc library}
 }

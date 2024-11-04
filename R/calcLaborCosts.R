@@ -57,7 +57,7 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsect
     if (isTRUE(inclForest)) stop("Forest labor costs not available for this datasource")
 
     # factor costs in mio. US$MER2017
-    facCostsLivst <- calcOutput("FactorCostsLivst", datasource = "USDA", inclFish = inclFish, 
+    facCostsLivst <- calcOutput("FactorCostsLivst", datasource = "USDA", inclFish = inclFish,
                                 other = otherLivst, aggregate = FALSE)
     facCostsCrops <- calcOutput("FactorCostsCrops", datasource = "USDA", aggregate = FALSE)
 
@@ -70,7 +70,7 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsect
     facCostsCrops <- setNames(dimSums(facCostsCrops, dim = 3), "Crops")
 
     years <- intersect(getYears(facCostsLivst, as.integer = TRUE), getYears(facCostsCrops, as.integer = TRUE))
-    facCosts <- mbind(facCostsLivst[, years, ], facCostsCrops[, years,])
+    facCosts <- mbind(facCostsLivst[, years, ], facCostsCrops[, years, ])
     if (isTRUE(inclFish)) facCosts <- mbind(facCosts, facCostsFish[, years, ])
 
     # add subsidies to factor costs
@@ -82,8 +82,8 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsect
                                     integrate_interpolated_years = TRUE,
                                     extrapolation_type = "constant")
 
-      facCosts[, , "Crops"] <- facCosts[, , "Crops"] + subsidies[, years , "Crops"]
-      facCosts[, , "Livestock"] <- facCosts[, , "Livestock"] + subsidies[, years , "Livestock"]
+      facCosts[, , "Crops"] <- facCosts[, , "Crops"] + subsidies[, years, "Crops"]
+      facCosts[, , "Livestock"] <- facCosts[, , "Livestock"] + subsidies[, years, "Livestock"]
     }
 
     # get labor-capital shares (same for all sectors)
@@ -91,16 +91,16 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsect
 
     # interpolate between the five-year-steps
     capitalShare <- time_interpolate(capitalShare,
-                               interpolated_year = setdiff(years, getYears(capitalShare, as.integer = TRUE)),
-                               extrapolation_type = "constant",
-                               integrate_interpolated_years = TRUE)[, years, ]
+                                     interpolated_year = setdiff(years, getYears(capitalShare, as.integer = TRUE)),
+                                     extrapolation_type = "constant",
+                                     integrate_interpolated_years = TRUE)[, years, ]
 
     # estimate total labor costs as share of factor costs
     out <- facCosts * (1 - capitalShare)
 
     # aggregate if subsectors is FALSE, but only in cases where both crops and livestock (and fisheries) are included
     if (isFALSE(subsectors)) {
-      incl <- out[, , "Livestock"] * out[, , "Crops"] 
+      incl <- out[, , "Livestock"] * out[, , "Crops"]
       if (isTRUE(inclFish)) incl <- incl * out[, , "Fisheries"]
       out <- dimSums(out, dim = 3)
       out[incl == 0] <- 0

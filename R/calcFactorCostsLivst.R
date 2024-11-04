@@ -4,6 +4,7 @@
 #' to VoP from FAO)
 #' @param otherLivst boolean: should FAO livestock categories that can't be matched to MAgPIE categories (i.e. beeswax,
 #' wool, silkworms, and honey) be reported as "livst_other"?
+#' @param inclFish boolean: should fish factor costs be included?
 #' @param unit output currency unit based on the toolConvertGDP function from the  GDPuc library
 #' @return List of magpie objects with results on country level, weight on country level, unit and description.
 #' @author Debbora Leip
@@ -13,7 +14,7 @@
 #' }
 #' @importFrom magclass setNames dimSums time_interpolate
 
-calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, inclFish = FALSE, 
+calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, inclFish = FALSE,
                                  unit = "constant 2017 US$MER") {
 
   if (datasource == "USDA") {
