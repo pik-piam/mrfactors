@@ -13,7 +13,8 @@
 #' }
 #' @importFrom magclass setNames dimSums time_interpolate
 
-calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit = "constant 2017 US$MER") {
+calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, inclFish = FALSE, 
+                                 unit = "constant 2017 US$MER") {
 
   if (datasource == "USDA") {
     # Value of Production for livestock in US$MER2017 (including FAO livst categories not mapped to MAgPIE categories)
@@ -22,6 +23,13 @@ calcFactorCostsLivst <- function(datasource = "USDA", otherLivst = FALSE, unit =
 
     # no VoP data before 1991, data for 2019 incomplete
     years <- setdiff(getYears(vopLivst, as.integer = TRUE), c(1960:1990, 2019))
+
+    # VoP of fish (reduces years) -- will use livestock cost shares also for fish
+    if (isTRUE(inclFish)) {
+      vopFish <- calcOutput("VoPAFF", aggregate = FALSE)[, , "Fisheries"]
+      years <- intersect(years, getYears(vopFish, as.integer = TRUE))
+      vopLivst <- mbind(vopLivst[, years, ], vopFish[, years, ])
+    }
 
     # USDA labor cost shares
     shares <- calcOutput("FractionInputsUSDA", products = "kli", aggregate = FALSE, keepConstantExtrapolation = TRUE)

@@ -56,75 +56,52 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsect
 
     if (isTRUE(inclForest)) stop("Forest labor costs not available for this datasource")
 
-    # Value of Production for livestock in US$MER2017 (including FAO livst categories not mapped to MAgPIE categories)
-    vopLivst <- calcOutput("VoPlivst", other = otherLivst, fillGaps = TRUE, aggregate = FALSE) # mio. US$MER2017
-    vopLivst <- setNames(dimSums(vopLivst, dim = 3), "Livestock")
+    # factor costs in mio. US$MER2017
+    facCostsLivst <- calcOutput("FactorCostsLivst", datasource = "USDA", inclFish = inclFish, 
+                                other = otherLivst, aggregate = FALSE)
+    facCostsCrops <- calcOutput("FactorCostsCrops", datasource = "USDA", aggregate = FALSE)
 
-    # Value of Production for crops in US$MER2017
-    vopCrops <- calcOutput("VoPcrops", fillGaps = TRUE, aggregate = FALSE) # mio. US$MER2017
-    vopCrops <- setNames(dimSums(vopCrops, dim = 3), "Crops")
-
-    # no VoP data before 1991, data for 2019 incomplete (using fillGaps in calcVoP reduces years to 1991:2013 anyway)
-    years <- setdiff(getItems(vopLivst, dim = 2), paste0("y", c(1960:1990, 2019)))
-
-    # VoP of fish (reduces years)
     if (isTRUE(inclFish)) {
-      vopFish <- calcOutput("VoPAFF", aggregate = FALSE)[, , "Fisheries"]
-      years <- intersect(years, getItems(vopFish, dim = 2))
+      facCostsFish <- facCostsLivst[, , "Fisheries"]
+      facCostsLivst <- facCostsLivst[, , "Fisheries", invert = TRUE]
     }
 
-    # add subsidies to VoP
+    facCostsLivst <- setNames(dimSums(facCostsLivst, dim = 3), "Livestock")
+    facCostsCrops <- setNames(dimSums(facCostsCrops, dim = 3), "Crops")
+
+    years <- intersect(getYears(facCostsLivst, as.integer = TRUE), getYears(facCostsCrops, as.integer = TRUE))
+    facCosts <- mbind(facCostsLivst[, years, ], facCostsCrops[, years,])
+    if (isTRUE(inclFish)) facCosts <- mbind(facCosts, facCostsFish[, years, ])
+
+    # add subsidies to factor costs
     if (isTRUE(addSubsidies)) {
-      subsidies <- calcOutput("IFPRIsubsidy", aggregate = FALSE)
+      subsidies <- calcOutput("NonMAgPIEFactorCosts", subtype = "subsidies", aggregate = FALSE)
       # to not loose years, we keep subsidies constant for past years which are not covered by the dataset
       subsidies <- time_interpolate(subsidies,
                                     interpolated_year = setdiff(years, getItems(subsidies, dim = 2)),
                                     integrate_interpolated_years = TRUE,
                                     extrapolation_type = "constant")
 
-      vopCrops <- vopCrops[, years, ] + subsidies[, years, "Crops"]
-      vopLivst <- vopLivst[, years, ] + subsidies[, years, "Livestock"]
+      facCosts[, , "Crops"] <- facCosts[, , "Crops"] + subsidies[, years , "Crops"]
+      facCosts[, , "Livestock"] <- facCosts[, , "Livestock"] + subsidies[, years , "Livestock"]
     }
 
-    # combine VoP for crops and livestock (and fish)
-    vopAg <- mbind(vopLivst[, years, ], vopCrops[, years, ])
-    if (isTRUE(inclFish)) vopAg <- mbind(vopAg, vopFish[, years, ])
-    vopAg[!is.finite(vopAg)] <- 0
-
-    # USDA labor cost shares
-    sharesCrops <- calcOutput("FractionInputsUSDA", products = "kcr", aggregate = FALSE)[, , "Labor"]
-    sharesLivst <- calcOutput("FractionInputsUSDA", products = "kli", aggregate = FALSE)[, , "Labor"]
-
-    # closest 5-year step before and after start of VoP data needed for interpolation of shares
-    yearsInt <- as.integer(str_split(years, "y", simplify = TRUE)[, 2])
-    y <- intersect(paste0("y", seq(min(yearsInt) - min(yearsInt) %% 5, max(yearsInt) - max(yearsInt) %% 5 + 5, 5)),
-                   getItems(sharesCrops, dim = 2))
-
-    # filling missing values with region average, using production as weight
-    h12 <- toolGetMapping("regionmappingH12.csv", type = "regional", where = "mappingfolder")
-    weight <- dimSums(collapseDim(calcOutput("Production", aggregate = FALSE)[, , "dm"]), dim = 3.1)
-    weight <- time_interpolate(weight, interpolated_year = setdiff(y, getItems(weight, dim = 2)),
-                               extrapolation_type = "constant", integrate_interpolated_years = TRUE)[, y, ]
-    sharesCrops <- toolFillWithRegionAvg(sharesCrops[, y, ], valueToReplace = 0, weight = weight,
-                                         regionmapping = h12, verbose = FALSE, warningThreshold = 1)
-    sharesLivst <- toolFillWithRegionAvg(sharesLivst[, y, ], valueToReplace = 0, weight = weight,
-                                         regionmapping = h12, verbose = FALSE, warningThreshold = 1)
-    shares <- setNames(mbind(sharesLivst, sharesCrops), c("Livestock", "Crops"))
-    # assume livestock labor cost share for fish
-    if (isTRUE(inclFish)) shares <- mbind(shares, setNames(sharesLivst, "Fisheries"))
+    # get labor-capital shares (same for all sectors)
+    capitalShare <- calcOutput("AgCapLabourShare", fillWithRegression = TRUE, aggregate = FALSE, projection = "SSP2")
 
     # interpolate between the five-year-steps
-    shares <- time_interpolate(shares,
-                               interpolated_year = setdiff(years, getYears(shares)),
+    capitalShare <- time_interpolate(capitalShare,
+                               interpolated_year = setdiff(years, getYears(capitalShare, as.integer = TRUE)),
                                extrapolation_type = "constant",
                                integrate_interpolated_years = TRUE)[, years, ]
 
-    # estimate total labor costs as share of VoP
-    out <- vopAg[, years, ] * shares
+    # estimate total labor costs as share of factor costs
+    out <- facCosts * (1 - capitalShare)
 
-    # aggregate if subsectors is FALSE, but only in cases where both crops and livestock are included
+    # aggregate if subsectors is FALSE, but only in cases where both crops and livestock (and fisheries) are included
     if (isFALSE(subsectors)) {
-      incl <- out[, , "Livestock"] * out[, , "Crops"]
+      incl <- out[, , "Livestock"] * out[, , "Crops"] 
+      if (isTRUE(inclFish)) incl <- incl * out[, , "Fisheries"]
       out <- dimSums(out, dim = 3)
       out[incl == 0] <- 0
     }
