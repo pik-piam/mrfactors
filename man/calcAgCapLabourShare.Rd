@@ -4,7 +4,14 @@
 \alias{calcAgCapLabourShare}
 \title{calcAgCapLabourShare}
 \usage{
-calcAgCapLabourShare()
+calcAgCapLabourShare(fillWithRegression = TRUE, projection = FALSE)
+}
+\arguments{
+\item{fillWithRegression}{boolean: should missing values be filled based on a regression between capital share
+and GDPpcPPP (calibrated to countries)}
+
+\item{projection}{either FALSE or SSP on which projections should be based. Only relevant if fillWithRegression is
+TRUE.}
 }
 \value{
 MAgPIE object
@@ -22,5 +29,5 @@ calcOutput("calcAgCapLabourShare")
 [calcAgCapLabourShare()]
 }
 \author{
-Edna J. Molina Bacca
+Edna J. Molina Bacca, Debbora Leip
 }

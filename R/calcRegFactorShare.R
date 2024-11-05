@@ -8,7 +8,10 @@
 #' @author Debbora Leip, Edna J. Molina Bacca
 #' @seealso [calcOutput()],[calcFactorIntensity()]
 #' @param datasource Only USDA available
-#' @param factor "lab" for Labour and "cap" for capital
+#' @param caseStudies The case studies to be used for the regression (either CountryCaseStudies or
+#' CaseStudiesDirectMapping). Default is CountryCaseStudies, as including regional case studies weakens the direct
+#' link to GDP per capita (and results in a regression with non-normally distributed residuals).
+#'
 #' @importFrom madrat calcOutput
 #' @importFrom magclass collapseDim dimSums getCells getYears
 #' @importFrom stats lm
@@ -18,78 +21,65 @@
 #' calcOutput("calcRegFactorShare")
 #' }
 #'
-calcRegFactorShare <- function(datasource = "USDA", factor = "cap") {
+calcRegFactorShare <- function(datasource = "USDA", caseStudies = "CountryCaseStudies") {
 
   if (datasource == "USDA") {
-    # raw USDA cost shares
-    usdaShares <- madrat::readSource("TFPUSDA")[, , c("AG_Labour", "Machinery")]
+    # raw USDA cost shares -- labor-capital ratio is the same for kcr and kli, as both are shared inputs
+    # We use kcr here, but use full factor costs (crops + livst) as aggregation weight and regression weight
+    shares <- calcOutput("FractionInputsUSDA", products = "kcr", aggregate = FALSE, keepConstantExtrapolation = FALSE)
+    capShare <- shares[, , "Capital"] / (shares[, , "Labor", drop = TRUE] + shares[, , "Capital", drop = TRUE])
+    capShare[is.na(capShare)] <- 0
 
-    # assuming the same share in the middle of the decade
-    usdaShares <- magclass::magpiesort(
-      magclass::time_interpolate(usdaShares,
-                                 interpolated_year = c((getYears(usdaShares, as.integer = TRUE) + 5)),
-                                 extrapolation_type = "constant", integrate_interpolated_years = TRUE))
+    # factor costs as weight (keeping constant for missing years in the past)
+    facCosts  <- setNames(dimSums(calcOutput("FactorCostsCrops", aggregate = FALSE), dim = 3) +
+                            dimSums(calcOutput("FactorCostsLivst", aggregate = FALSE), dim = 3), "FactorCosts")
+    facCosts  <- time_interpolate(facCosts, interpolated_year = seq(1960, 1990),
+                                  extrapolation_type = "constant", integrate_interpolated_years = TRUE)
 
-    # Production (in terms of dry matter) as weight
-    prodCrops <- dimSums(collapseDim(calcOutput("Production", products = "kcr", aggregate = FALSE)[, , "dm"]), dim = 3)
-    prodLivst <- dimSums(collapseDim(calcOutput("Production", products = "kli", aggregate = FALSE)[, , "dm"]), dim = 3)
-    totalProd <- prodCrops + prodLivst
-    weight <- usdaShares
-    weight[, , ] <- magclass::magpiesort(
-      magclass::time_interpolate(totalProd[, , ], interpolated_year = c(1960, 2015),
-                                 extrapolation_type = "constant",
-                                 integrate_interpolated_years = TRUE))[, getYears(usdaShares), ]
+    # dependent variable
+    gdp <- calcOutput("GDPpc", naming = "scenario", unit = "constant 2017 Int$PPP", aggregate = FALSE)[, , "SSP2"]
+    gdp <- setNames(gdp, "GDP_pc")
 
-    # aggregate shares
-    mapping <- madrat::toolGetMapping("regionmappingUSDATFPISO.csv", where = "mrcommons")
-    weight[usdaShares[, , "AG_Labour", drop = TRUE] == 0] <- 0 # excluding shares that are zero in aggregation
-    # Unusually high capital shares
-    weight[c("BLZ", "CRI", "DOM", "HND", "JAM", "MEX", "NIC", "PAN", "SLV", "JPN"), , ] <- 0
+    # mapping to case studies
+    mapping <- madrat::toolGetMapping("caseStudiesUSDATFP.csv", where = "mrfactors", type = "regional")
+    mapping <- mapping[, c("ISO", caseStudies)]
+    mapping <- mapping[!is.na(mapping[, caseStudies]), ]
+    countries <- unique(mapping$ISO)
 
-    country <- intersect(getCells(usdaShares), intersect(getCells(weight), unique(mapping$ISO)))
-    years <- intersect(getYears(usdaShares), getYears(weight))
-    mapping1 <- mapping[mapping$ISO %in% country, ]
-    usdaShares <- madrat::toolAggregate(usdaShares[country, years, ], rel = mapping1, weight = weight[country, years, ],
-                                        from = "ISO", to = "Region", dim = 1)
+    # aggregate shares using factor costs as weight
+    capShare <- capShare[countries, , ]
+    weight  <- facCosts[countries, getYears(capShare), ]
+    weight[capShare == 0] <- 0
+    weight <- weight + 1e-12
+    capShare <- toolAggregate(capShare, rel = mapping, weight = weight,
+                              from = "ISO", to = caseStudies, dim = 1)
 
-    # re-scale shares to sum of labor + capital costs
-    usdaShares <- usdaShares / dimSums(usdaShares, dim = 3)
+    # aggregate GDP per capita using population as weight
+    pop <- calcOutput("Population", naming = "scenario", aggregate = FALSE)[, , "SSP2"]
+    weight2 <- pop[countries, getYears(capShare), ]
+    weight2[weight == 1e-12] <- 1e-12
+    gdp <- toolAggregate(gdp[countries, getYears(capShare), ], rel = mapping,
+                         weight = weight2, from = "ISO", to = caseStudies, dim = 1)
 
-    # GDP (US$PPP) per capita as independent variable
-    gdp <- calcOutput("GDPpc", unit = "constant 2017 Int$PPP", naming = "scenario", aggregate = FALSE)[, , "SSP2"]
-    country <- intersect(getCells(gdp), unique(mapping$ISO))
-    mapping2 <- mapping[mapping$ISO %in% country, ]
-    years <- intersect(getYears(gdp), getYears(weight))
+    # aggregate factor costs as regression weight
+    weightRegr <- toolAggregate(facCosts[countries, getYears(capShare), ], rel = mapping,
+                                weight = NULL, from = "ISO", to = caseStudies, dim = 1)
 
-    gdp <- madrat::toolAggregate(gdp[country, years, ], rel = mapping2, weight = weight[country, years, "Machinery"],
-                                 from = "ISO", to = "Region")
+    # combine data
+    data <- mbind(capShare, gdp, weightRegr)
+    data <- as.data.frame(data)[, 2:5]
+    data <- reshape(data, idvar = c("Region", "Year"), timevar = "Data1", direction = "wide")
+    colnames(data) <- c("Region", "Year", "CapitalShare", "GDP_pc", "FactorCosts")
+    data <- data[data$CapitalShare != 0, ]
 
-    # reducing to shared years
-    years <- intersect(getYears(usdaShares), getYears(gdp))
-    gdp <- gdp[, years, ]
-    magclass::getNames(gdp) <- "GDP_pc"
-    usdaShares <- usdaShares[, years, ]
 
-    # setting up data frame
-    variables <- magclass::mbind(usdaShares, gdp)
-    variables <- as.data.frame(variables)[, 2:5]
-    variables <- reshape(variables, idvar = c("Region", "Year"), timevar = "Data1", direction = "wide")
-    variables[, "Value.GDP_pc_log"] <- log(variables[, "Value.GDP_pc"], base = 10)
-    variables <- variables[variables$Region != "AFRICA, Developed", ]
-
-    # regression for labor or capital cost share
-    if (factor == "lab") {
-      res1 <- lm(Value.AG_Labour ~ Value.GDP_pc_log, variables)
-    } else if (factor == "cap") {
-      res1 <- lm(Value.Machinery ~ Value.GDP_pc_log, variables)
-    }
+    # regression
+    fit <- lm(CapitalShare ~ log(GDP_pc, base = 10), data = data, weights = data$FactorCosts)
 
     # create magclass object
-    res <- magclass::new.magpie(names = c("slope", "intercept"), sets = c("Region", "Year", "coefficients"))
-    res[, , "slope"] <- as.numeric(res1[["coefficients"]][2])
-    res[, , "intercept"] <- as.numeric(res1[["coefficients"]][1])
-
-
+    res <- new.magpie(names = c("slope", "intercept"), sets = c("Region", "Year", "coefficients"))
+    res[, , "slope"] <- as.numeric(fit[["coefficients"]][2])
+    res[, , "intercept"] <- as.numeric(fit[["coefficients"]][1])
   } else {
     stop("Data source not available")
   }
@@ -98,6 +88,6 @@ calcRegFactorShare <- function(datasource = "USDA", factor = "cap") {
   return(list(x = res,
               weight = NULL,
               unit = "Share",
-              description = paste("Regression parameters for factor share (capital or labour) calculation",
+              description = paste("Regression parameters for capital share out of factor requirements (capital+labor) ",
                                   "based on log10(GDPpc)")))
 }

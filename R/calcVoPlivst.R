@@ -82,7 +82,11 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit = "constant 2017 U
   }
 
   units <- paste0("mio ", unit)
-
+  
+  # remove years with no data
+  years <- where(dimSums(vopLivst, dim = c(1, 3)) == 0)$true$years
+  vopLivst <- vopLivst[, years, , invert = TRUE]
+  
   return(list(x = vopLivst,
               weight = NULL,
               unit = units,

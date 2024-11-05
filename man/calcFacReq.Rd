@@ -13,7 +13,7 @@ calcFacReq(splitSectors = FALSE)
 MAgPIE object
 }
 \description{
-This function calculates factor requirement costs (05USDMER/tDM) on regional level,
+This function calculates factor requirement costs (constant 2017 US$MER/tDM) on regional level,
 based FAO databases
 }
 \examples{

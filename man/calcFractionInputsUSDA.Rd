@@ -4,16 +4,24 @@
 \alias{calcFractionInputsUSDA}
 \title{calcFractionInputsUSDA}
 \usage{
-calcFractionInputsUSDA(products = "kcr")
+calcFractionInputsUSDA(
+  products = "kcr",
+  keepConstantExtrapolation = TRUE,
+  interpolate = TRUE
+)
 }
 \arguments{
 \item{products}{either "kcr" for crops, or "kli" for livestock}
+
+\item{keepConstantExtrapolation}{boolean: should constant extrapolation from Fuglie et al. be kept?}
+
+\item{interpolate}{boolean: should the data be interpolated to the middle of the decade?}
 }
 \value{
 magpie object of the shares of the factor requirements in agriculture (capital, labor, materials, land).
 }
 \description{
-Calculates the factor factor shares for crop production from USDA'S Inputs shares.
+Calculates the factor factor shares for crop or livestock production from USDA'S Inputs shares.
 }
 \examples{
 \dontrun{

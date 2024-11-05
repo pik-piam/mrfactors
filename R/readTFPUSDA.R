@@ -6,8 +6,9 @@
 #' @importFrom readxl read_excel
 #' @importFrom stats reshape
 #' @seealso [readSource()]
+
 readTFPUSDA <- function() {
- # File
+  # File
   file <- "AgTFPindividualcountries.xlsx"
 
   # Reads countries from the file
@@ -48,7 +49,7 @@ readTFPUSDA <- function() {
   # Merges read data with the fao mapping by country code
   data <- merge(data, isocodeFAO, by = "CountryCode", all = FALSE)[, c("ISO3", "Year", "Input", "Value")]
 
-  # Creates magpie object (184 countries)
+  # Creates magpie object (176 countries)
   x <- magpiesort(as.magpie(data, spatial = 1, temporal = 2, datacol = 4))
 
   # Filling HKG and SGP with developed Asia values

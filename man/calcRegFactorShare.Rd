@@ -4,12 +4,14 @@
 \alias{calcRegFactorShare}
 \title{calcRegFactorShare}
 \usage{
-calcRegFactorShare(datasource = "USDA", factor = "cap")
+calcRegFactorShare(datasource = "USDA", caseStudies = "CountryCaseStudies")
 }
 \arguments{
 \item{datasource}{Only USDA available}
 
-\item{factor}{"lab" for Labour and "cap" for capital}
+\item{caseStudies}{The case studies to be used for the regression (either CountryCaseStudies or
+CaseStudiesDirectMapping). Default is CountryCaseStudies, as including regional case studies weakens the direct
+link to GDP per capita (and results in a regression with non-normally distributed residuals).}
 }
 \value{
 MAgPIE object at global level with slope and intersect as items

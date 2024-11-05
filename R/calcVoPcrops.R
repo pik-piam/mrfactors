@@ -1,6 +1,6 @@
 #' @title calcVoPcrops
 #' @description Calculates the value of production of individual production items or
-#' its fraction compared to overall Value of Production (Agriculture,Fish,Forestry).
+#' its fraction compared to overall Value of Production (Agriculture, Fish, Forestry).
 #'
 #' @param fillGaps boolean: should gaps be filled using production * prices (where production data is available)?
 #' @param unit output currency unit based on the toolConvertGDP function from the  GDPuc library
@@ -104,6 +104,10 @@ calcVoPcrops <- function(fillGaps = TRUE, unit = "constant 2017 US$MER") {
 
 
   units <- paste0("mio ", unit)
+
+  # remove years with no data
+  years <- where(dimSums(vopKcrAggregated, dim = c(1, 3)) == 0)$true$years
+  vopKcrAggregated <- vopKcrAggregated[, years, , invert = TRUE]
 
   return(list(x = vopKcrAggregated,
               weight = weight,

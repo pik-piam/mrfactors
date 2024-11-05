@@ -1,6 +1,6 @@
 #' @title calcFactorIntensity
-#' @description Calculates factor intensity for labour and/or capital from USDA (Inputs share)
-#' and FAO (Value of Production).
+#' @description Calculates factor intensity in crop production for labour and/or capital from USDA (Inputs share)
+#' and FAO (Value of Production)in constant 2017 US$MER per ton.
 #' Capital intensity and requirements can also be calculated from FAO's CapitalStock database.
 #'
 #'
@@ -141,6 +141,8 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA", unit = 
                         unit_out = unit,
                         replace_NAs = "no_conversion")
   }
+
+  weight <- weight + 1e-20
 
   return(list(x = x,
               weight = weight,
