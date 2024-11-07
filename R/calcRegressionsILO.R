@@ -52,7 +52,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24"
   if (subtype == "AgEmplShare") {# Regression to fill missing countries in ILO ag. employment data set
 
     cat(paste0("Note: You are recalculating this regression. If this should be the new default regression you",
-               " need to manually save the resulting regression coefficients in the source folder.")) 
+               " need to manually save the resulting regression coefficients in the source folder."))
     cat(paste0("Note: In case underlying data changed (agricultural employment from ILO, historic population,",
                " or GDP pc PPP) you should double check the resulting regression."))
     description <- paste0("Regression coeffcients for sqrt(ag. empl. share) ~ log(GDP pc PPP, base = 10) ",
@@ -73,8 +73,8 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24"
     share <- iloEmpl[, getYears(pop), "Total", drop = TRUE] / pop[, , , drop = TRUE]
     getNames(share) <- "share_empl_ag"
 
-    # GDP per capita as independent variable (updated currency baseyear since Aug 24)
-    gdpPc <- calcOutput("GDPpcPast", unit = "constant 2017 Int$PPP", aggregate = FALSE)
+    # GDP per capita as independent variable (updated currency baseyear since Aug 24, now in constant 2017 Int$PPP)
+    gdpPc <- calcOutput("GDPpcPast", aggregate = FALSE)
 
     years <- intersect(getYears(share), getYears(gdpPc))
     gdpPc <- gdpPc[, years, ]
@@ -119,7 +119,7 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24"
 
     cat(paste0("Note: You are recalculating this regression. If this should be the new default regression you",
                " need to manually save the resulting regression coefficients in the source folder."))
-               
+
     ## HOURLY LABOR COSTS DATA FROM ILO
 
     # original hourly labor costs dataset (ILO data + data for India + data for China)
@@ -128,7 +128,10 @@ calcRegressionsILO <- function(subtype = "AgEmplShare", dataVersionILO = "Aug24"
     hourlyLaborCosts[hourlyLaborCosts == 0] <- NA
 
     ## GDP PER CAPITA IN US$MER AS DEPENDENT VARIABLE (updated currency baseyear since Aug 24)
-    gdpPcMER <- calcOutput("GDPpcPast", unit = "constant 2017 US$MER", aggregate = FALSE)
+    gdpPcMER <- GDPuc::toolConvertGDP(calcOutput("GDPpcPast", aggregate = FALSE),
+                                      unit_in = "constant 2017 Int$PPP",
+                                      unit_out = "constant 2017 US$MER",
+                                      replace_NAs = c("with_USA"))
 
     ## combining data
     years <- intersect(getItems(hourlyLaborCosts, dim = 2), getItems(gdpPcMER, dim = 2))
