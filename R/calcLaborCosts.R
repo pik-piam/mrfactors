@@ -58,7 +58,7 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsect
 
     # factor costs in mio. US$MER2017
     facCostsLivst <- calcOutput("FactorCostsLivst", datasource = "USDA", inclFish = inclFish,
-                                other = otherLivst, aggregate = FALSE)
+                                otherLivst = otherLivst, aggregate = FALSE)
     facCostsCrops <- calcOutput("FactorCostsCrops", datasource = "USDA", aggregate = FALSE)
 
     if (isTRUE(inclFish)) {
