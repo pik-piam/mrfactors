@@ -39,7 +39,11 @@ calcAgCapLabourShare <- function(fillWithRegression = TRUE, projection = FALSE) 
     regCoeff <- calcOutput("RegFactorShare", aggregate = FALSE)
 
     # calculate GDPpc [USD2017PPP] for regression
-    gdp <- calcOutput("GDPpc", naming = "scenario", unit = "constant 2017 Int$PPP", aggregate = FALSE)
+    gdp <- calcOutput("GDPpc",
+                      scenario = "SSPs",
+                      naming = "scenario",
+                      unit = "constant 2017 Int$PPP",
+                      aggregate = FALSE)
     if (!isFALSE(projection)) {
       years <- setdiff(getItems(gdp, dim = 2), paste0("y", seq(2105, 2150, 5)))
       gdp <- gdp[, years, projection]
