@@ -37,7 +37,7 @@ calcRegFactorShare <- function(datasource = "USDA", caseStudies = "CountryCaseSt
                                   extrapolation_type = "constant", integrate_interpolated_years = TRUE)
 
     # dependent variable
-    gdp <- calcOutput("GDPpc", naming = "scenario", unit = "constant 2017 Int$PPP", aggregate = FALSE)[, , "SSP2"]
+    gdp <- calcOutput("GDPpc", scenario = "SSP2", unit = "constant 2017 Int$PPP", aggregate = FALSE)
     gdp <- setNames(gdp, "GDP_pc")
 
     # mapping to case studies
@@ -55,7 +55,7 @@ calcRegFactorShare <- function(datasource = "USDA", caseStudies = "CountryCaseSt
                               from = "ISO", to = caseStudies, dim = 1)
 
     # aggregate GDP per capita using population as weight
-    pop <- calcOutput("Population", naming = "scenario", aggregate = FALSE)[, , "SSP2"]
+    pop <- calcOutput("Population", scenario = "SSP2", naming = "scenario", aggregate = FALSE)
     weight2 <- pop[countries, getYears(capShare), ]
     weight2[weight == 1e-12] <- 1e-12
     gdp <- toolAggregate(gdp[countries, getYears(capShare), ], rel = mapping,

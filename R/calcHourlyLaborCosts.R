@@ -98,11 +98,11 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
       # remove outliers
       hourlyCosts[hourlyCosts > 100] <- 0 # unreasonable high values
       gdpMERpc <- calcOutput("GDPpc",
-                             scenario = "SSPs",
+                             scenario = "SSP2",
                              unit = "constant 2017 US$MER",
                              average2020 = FALSE,
                              naming = "scenario",
-                             aggregate = FALSE)[getItems(hourlyCosts, dim = 1), getItems(hourlyCosts, dim = 2), "SSP2"]
+                             aggregate = FALSE)[getItems(hourlyCosts, dim = 1), getItems(hourlyCosts, dim = 2), ]
       hourlyCosts[hourlyCosts < 0.1 & gdpMERpc > 3000] <- 0  # unreasonable low values
 
     } else if (datasource == "USDA_FAO") { # from USDA/FAO labor costs for crop+livst, ag. empl. and weekly hours
