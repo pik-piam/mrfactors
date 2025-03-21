@@ -30,7 +30,7 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit = "constant 2017 U
   items <- mappingFAO$FAO_item
 
   # aggregation to magpie objects (and livst_other)
-  vopLivst <- toolAggregate(vop[, , items], rel = mappingFAO, from = "FAO_item", to = "kli", weight = NULL, dim = 3)
+  vopLivst <- toolAggregate(vop[, , items], rel = mappingFAO, from = "post1124_FAO_Item", to = "kli", weight = NULL, dim = 3)
 
   # VoP in North Korea too high? -> excluded
   vopLivst["PRK", , ] <- 0
