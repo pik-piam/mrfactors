@@ -27,7 +27,7 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit = "constant 2017 U
   if (isFALSE(other)) {
     mappingFAO <- mappingFAO[mappingFAO$kli != "livst_other", ]
   }
-  items <- mappingFAO$FAO_item
+  items <- mappingFAO$post1124_FAO_Item
 
   # aggregation to magpie objects (and livst_other)
   vopLivst <- toolAggregate(vop[, , items], rel = mappingFAO, from = "post1124_FAO_Item", to = "kli", weight = NULL, dim = 3)
