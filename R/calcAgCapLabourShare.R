@@ -41,7 +41,6 @@ calcAgCapLabourShare <- function(fillWithRegression = TRUE, projection = FALSE) 
     # calculate GDPpc [USD2017PPP] for regression
     gdp <- calcOutput("GDPpc",
                       scenario = "SSPs",
-                      naming = "scenario",
                       unit = "constant 2017 Int$PPP",
                       aggregate = FALSE)
     if (!isFALSE(projection)) {

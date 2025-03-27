@@ -55,7 +55,7 @@ calcRegFactorShare <- function(datasource = "USDA", caseStudies = "CountryCaseSt
                               from = "ISO", to = caseStudies, dim = 1)
 
     # aggregate GDP per capita using population as weight
-    pop <- calcOutput("Population", scenario = "SSP2", naming = "scenario", aggregate = FALSE)
+    pop <- calcOutput("Population", scenario = "SSP2", aggregate = FALSE)
     weight2 <- pop[countries, getYears(capShare), ]
     weight2[weight == 1e-12] <- 1e-12
     gdp <- toolAggregate(gdp[countries, getYears(capShare), ], rel = mapping,

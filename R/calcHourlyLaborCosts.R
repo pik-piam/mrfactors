@@ -101,7 +101,6 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
                              scenario = "SSP2",
                              unit = "constant 2017 US$MER",
                              average2020 = FALSE,
-                             naming = "scenario",
                              aggregate = FALSE)[getItems(hourlyCosts, dim = 1), getItems(hourlyCosts, dim = 2), ]
       hourlyCosts[hourlyCosts < 0.1 & gdpMERpc > 3000] <- 0  # unreasonable low values
 
@@ -153,7 +152,6 @@ calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug2
                            scenario = "SSPs",
                            unit = "constant 2017 US$MER",
                            average2020 = FALSE,
-                           naming = "scenario",
                            aggregate = FALSE)
 
     if (!isFALSE(projection)) {
