@@ -129,27 +129,28 @@ calcPricesProducer <- function(products = "kcr", calculation = "VoP", weighting 
       pricesProdFAO <- readSource("FAO_online", "PricesProducerAnnual") # USD2017 per ton
 
 
-    
-      # get new mapping 
-    mappingFAO <- toolGetMapping("FAOitems_online_2010update.csv", type = "sectoral", where = "mrfaocore") # Reads mapping
- 
-       weightProd <- collapseNames(readSource("FAO_online", "LivePrim")[, , "production"])
-       weightProd <- toolAggregate(weightProd, rel = mappingFAO, from = "pre2010_ProductionItem", 
-                                               to = "post2010_ProductionItem", partrel = TRUE, dim = 3)
+
+      # get new mapping
+      mappingFAO <- toolGetMapping("FAOitems_online_2010update.csv", type = "sectoral", where = "mrfaocore")
+
+      weightProd <- collapseNames(readSource("FAO_online", "LivePrim")[, , "production"])
+      weightProd <- toolAggregate(weightProd, rel = mappingFAO, from = "pre2010_ProductionItem",
+                                  to = "post2010_ProductionItem", partrel = TRUE, dim = 3)
       if (weighting == "production") {
         itemsIntersect <- intersect(getNames(pricesProdFAO), unique(mappingFAO$post2010_ProductionItem))
         # Prod. of livestock primary prod
-      
+
         # subseting of items
         names <- intersect(getNames(weightProd), getNames(pricesProdFAO[, , itemsIntersect]))
         years <- intersect(getYears(weightProd), getYears(pricesProdFAO[, , itemsIntersect]))
         mappingFAO <- mappingFAO[mappingFAO$post2010_ProductionItem %in% names, ]
 
         # Aggregation to magpie objects
-        pricesProdFAOkli <- toolAggregate(pricesProdFAO[, years, names], rel = mappingFAO, from = "post2010_ProductionItem",
+        pricesProdFAOkli <- toolAggregate(pricesProdFAO[, years, names], rel = mappingFAO,
+                                          from = "post2010_ProductionItem",
                                           to = "k", weight = weightProd[, years, names], dim = 3, wdim = 3,
                                           zeroWeight = "allow")
-       pricesProdFAOkli <- pricesProdFAOkli[, , "", invert = TRUE]
+        pricesProdFAOkli <- pricesProdFAOkli[, , "", invert = TRUE]
 
       } else if (weighting == "consumption") {
         # map prices to FoodBalanceITems first
@@ -170,7 +171,8 @@ calcPricesProducer <- function(products = "kcr", calculation = "VoP", weighting 
         mappingFAO <- mappingFAO[mappingFAO$post2010_FoodBalanceItem %in% names, ]
 
         pricesProdFAOkli <- toolAggregate(pricesProdFAO[, years, names], rel = mappingFAO,
-                                          from = "post2010_FoodBalanceItem", to = "k", weight = weightPrice[, years, names],
+                                          from = "post2010_FoodBalanceItem", to = "k",
+                                          weight = weightPrice[, years, names],
                                           dim = 3, wdim = 3, zeroWeight = "allow")
         pricesProdFAOkli <- pricesProdFAOkli[, , "", invert = TRUE]
       } else {

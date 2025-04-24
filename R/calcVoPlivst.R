@@ -17,7 +17,6 @@
 #' }
 #'
 calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit = "constant 2017 US$MER") {
-
   # Value of production of individual items (US$MER05)
   item <- "Gross_Production_Value_(USDMER17)_(1000_US$)"
   vop <- readSource("FAO_online", "ValueOfProd")[, , item] / 1000 # mio. US$MER17
@@ -30,7 +29,9 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit = "constant 2017 U
   items <- mappingFAO$post1124_FAO_Item
 
   # aggregation to magpie objects (and livst_other)
-  vopLivst <- toolAggregate(vop[, , items], rel = mappingFAO, from = "post1124_FAO_Item", to = "kli", weight = NULL, dim = 3)
+  vopLivst <- toolAggregate(vop[, , items], rel = mappingFAO,
+                            from = "post1124_FAO_Item", to = "kli",
+                            weight = NULL, dim = 3)
 
   # VoP in North Korea too high? -> excluded
   vopLivst["PRK", , ] <- 0
@@ -82,11 +83,11 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit = "constant 2017 U
   }
 
   units <- paste0("mio ", unit)
-  
+
   # remove years with no data
   years <- where(dimSums(vopLivst, dim = c(1, 3)) == 0)$true$years
   vopLivst <- vopLivst[, years, , invert = TRUE]
-  
+
   return(list(x = vopLivst,
               weight = NULL,
               unit = units,
