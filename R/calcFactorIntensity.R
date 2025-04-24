@@ -29,8 +29,10 @@ calcFactorIntensity <- function(output = "intensities", method = "USDA", unit = 
 
     # Production of crops. mio. ton
     cropProdDMall  <- collapseDim(calcOutput("Production", products = "kcr", aggregate = FALSE, attributes = "dm"))
+    cropProdDMall[cropProdDMall < 1e-6] <- 0 # remove very small values to avoid strange results when dividing
 
     vopCrops <- calcOutput("VoPcrops", aggregate = FALSE, unit = "constant 2017 US$MER")
+    vopCrops[vopCrops < 1e-6] <- 0 # remove very small values to avoid strange results when dividing
 
     gnames <- intersect(getNames(vopCrops), getNames(cropProdDMall))
     gyears <- intersect(getYears(vopCrops), getYears(cropProdDMall))
