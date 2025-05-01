@@ -73,7 +73,7 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsect
     facCosts <- mbind(facCostsLivst[, years, ], facCostsCrops[, years, ])
     if (isTRUE(inclFish)) facCosts <- mbind(facCosts, facCostsFish[, years, ])
 
-    # add subsidies to factor costs
+    # add subsidies to factor costs (but only if we have factor costs, otherwise it will give strange results (ISL))
     if (isTRUE(addSubsidies)) {
       subsidies <- calcOutput("NonMAgPIEFactorCosts", subtype = "subsidies", aggregate = FALSE)
       # to not loose years, we keep subsidies constant for past years which are not covered by the dataset
@@ -82,8 +82,11 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsect
                                     integrate_interpolated_years = TRUE,
                                     extrapolation_type = "constant")
 
-      facCosts[, , "Crops"] <- facCosts[, , "Crops"] + subsidies[, years, "Crops"]
-      facCosts[, , "Livestock"] <- facCosts[, , "Livestock"] + subsidies[, years, "Livestock"]
+      isoCrops <- where(facCosts[, , "Crops"] != 0)$true$regions
+      isoLivst <- where(facCosts[, , "Livestock"] != 0)$true$regions
+
+      facCosts[isoCrops, , "Crops"] <- facCosts[isoCrops, , "Crops"] + subsidies[isoCrops, years, "Crops"]
+      facCosts[isoLivst, , "Livestock"] <- facCosts[isoLivst, , "Livestock"] + subsidies[isoLivst, years, "Livestock"]
     }
 
     # get labor-capital shares (same for all sectors)
