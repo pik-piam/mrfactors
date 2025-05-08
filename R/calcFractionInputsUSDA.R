@@ -30,9 +30,6 @@ calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation =
                                              interpolated_year = years,
                                              extrapolation_type = "constant", integrate_interpolated_years = TRUE))
   }
-  # actually we can add one more time step because the TFPUSDA  is "1961-1970", which we assign 1960 and now 1965
-  # so by same logic 2015 can be included based on 2010 data
-  tfpShares <- toolHoldConstant(tfpShares, years = 2015)
 
   # remove constant extrapolation
   if (isFALSE(keepConstantExtrapolation)) {

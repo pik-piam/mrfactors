@@ -24,7 +24,7 @@ readTFPUSDA <- function() {
   # Function to extract the values of the shares and organize the data in a format easy to convert to a magpie object
   extractFractions <- function(names = names, ranges = ranges, file = file, regions = regions) {
     data <- NULL
-    yearsS <- as.character(seq(from = 1960, to = 2010, by = 10))
+    yearsS <- as.character(seq(from = 1965, to = 2015, by = 10))
 
     for (n in seq_along(names)) {
       dataInt <- as.data.frame(read_excel(file, sheet = "Cost Shares", range = ranges[n]))
