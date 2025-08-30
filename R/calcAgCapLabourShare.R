@@ -17,6 +17,7 @@
 #' }
 #' @importFrom madrat calcOutput
 #' @importFrom magclass collapseDim collapseNames dimSums getYears
+#' @importFrom stringr str_split
 #'
 calcAgCapLabourShare <- function(fillWithRegression = TRUE, projection = FALSE) {
   # raw USDA cost shares -- labor-capital ratio is the same for kcr and kli, as both are shared inputs
