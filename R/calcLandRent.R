@@ -2,6 +2,7 @@
 #' @description Calculates factor intensity in crop production for ladn rent from USDA (Inputs share)
 #' and FAO (Value of Production) and productivity in constant 2017 US$MER per ha.
 #' @param unit output currency unit based on the toolConvertGDP function from the  GDPuc library
+#' @param rent rent type cropland average "cropland" or per crop type "perCrop"
 #' @return magpie object of the land factor requirements in USD/ha per crop
 #' @author Edna J. Molina Bacca
 #' @seealso [calcOutput()]
@@ -10,21 +11,31 @@
 #' a <- calcOutput("LandRent")
 #' }
 #'
-calcLandRent <- function(unit = "constant 2017 US$MER") {
+calcLandRent <- function(unit = "constant 2017 US$MER", rent = "cropland") {
+  
   # Cropland Area
-  cropAreaAll  <- collapseDim(calcOutput("Croparea", aggregate = FALSE))
-  cropAreaAll[cropAreaAll < 1e-3] <- 0 # remove very small values to avoid strange results when dividing
-
-  # Value of production
   vopCrops <- calcOutput("VoPcrops", aggregate = FALSE, unit = "constant 2017 US$MER")
-  vopCrops[vopCrops < 1e-4] <- 0 # remove very small values to avoid strange results when dividing
 
-  gnames <- intersect(getNames(vopCrops), getNames(cropAreaAll))
+  if (rent == "perCrop") {
+  cropAreaAll  <- collapseDim(calcOutput("Croparea", aggregate = FALSE)) 
+  
+  } else if (rent == "cropland"){
+  cropAreaAll <- dimSums(calcOutput("LanduseInitialisation", nclasses = "seven", aggregate = FALSE, 
+                 cellular = FALSE)[, , c("crop")], dim = 3)
+  vopCrops <- dimSums(vopCrops,dim=3)
+   
+  }
+  
+  cropAreaAll[cropAreaAll < 1e-4] <- NA # remove very small values to avoid strange results when dividing 
+   vopCrops[vopCrops < 1e-5] <- NA # remove very small values to avoid strange results when dividing
+
+  if (rent == "perCrop") gnames <- intersect(getNames(vopCrops), getNames(cropAreaAll))
   gyears <- intersect(getYears(vopCrops), getYears(cropAreaAll))
   gcells <- intersect(getCells(vopCrops), getCells(cropAreaAll))
 
-  # Value of production per hectar
-  vopPerHa <- vopCrops[gcells, gyears, gnames] / cropAreaAll[gcells, gyears, gnames]
+  # Value of production per hectare
+  if (rent == "perCrop") vopPerHa <- vopCrops[gcells, gyears, gnames] / cropAreaAll[gcells, gyears, gnames]
+  if (rent == "cropland") vopPerHa <- vopCrops[gcells, gyears, ] / cropAreaAll[gcells, gyears, ]
   vopPerHa[!is.finite(vopPerHa)] <- 0
 
   # Fraction of each land input in overall value of production
@@ -33,14 +44,18 @@ calcLandRent <- function(unit = "constant 2017 US$MER") {
   fyears <- intersect(getYears(fractionInputs), getYears(vopPerHa))
 
   # Calculation of land intensities
-  intensity <- fractionInputs[, fyears, ] * vopPerHa[, fyears, ]
+  intensity <- setNames(fractionInputs[, fyears, ], NULL) * vopPerHa[, fyears, ]
+  if (rent == "perCrop") intensity[, , c("begr", "betr")] <- intensity[, , c("maiz")]
 
-  weight <- cropAreaAll[, fyears, gnames]
+  # strange behavior in  PSE ans MUS
+  intensity[c("PSE","MUS"),,] <- NA
+
+  weight <- cropAreaAll[, fyears, ]
   weight[!is.finite(intensity)] <- 0
   weight[intensity == 0] <- 0
 
 
-  units <- "constant 2017 US$MER/ hectare"
+  units <- paste0(unit, "/hectare")
 
 
   x <- toolConvertGDP(intensity,
