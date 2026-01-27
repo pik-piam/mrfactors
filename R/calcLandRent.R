@@ -12,22 +12,21 @@
 #' }
 #'
 calcLandRent <- function(unit = "constant 2017 US$MER", rent = "cropland") {
-  
   # Cropland Area
   vopCrops <- calcOutput("VoPcrops", aggregate = FALSE, unit = "constant 2017 US$MER")
 
   if (rent == "perCrop") {
-  cropAreaAll  <- collapseDim(calcOutput("Croparea", aggregate = FALSE)) 
-  
-  } else if (rent == "cropland"){
-  cropAreaAll <- dimSums(calcOutput("LanduseInitialisation", nclasses = "seven", aggregate = FALSE, 
-                 cellular = FALSE)[, , c("crop")], dim = 3)
-  vopCrops <- dimSums(vopCrops,dim=3)
-   
+    cropAreaAll  <- collapseDim(calcOutput("Croparea", aggregate = FALSE))
+
+  } else if (rent == "cropland") {
+    cropAreaAll <- dimSums(calcOutput("LanduseInitialisation", nclasses = "seven", aggregate = FALSE,
+                                      cellular = FALSE)[, , c("crop")], dim = 3)
+    vopCrops <- dimSums(vopCrops, dim = 3)
+
   }
-  
-  cropAreaAll[cropAreaAll < 1e-4] <- NA # remove very small values to avoid strange results when dividing 
-   vopCrops[vopCrops < 1e-5] <- NA # remove very small values to avoid strange results when dividing
+
+  cropAreaAll[cropAreaAll < 1e-4] <- NA # remove very small values to avoid strange results when dividing
+  vopCrops[vopCrops < 1e-5] <- NA # remove very small values to avoid strange results when dividing
 
   if (rent == "perCrop") gnames <- intersect(getNames(vopCrops), getNames(cropAreaAll))
   gyears <- intersect(getYears(vopCrops), getYears(cropAreaAll))
@@ -48,7 +47,7 @@ calcLandRent <- function(unit = "constant 2017 US$MER", rent = "cropland") {
   if (rent == "perCrop") intensity[, , c("begr", "betr")] <- intensity[, , c("maiz")]
 
   # strange behavior in  PSE ans MUS
-  intensity[c("PSE","MUS"),,] <- NA
+  intensity[c("PSE", "MUS"), , ] <- NA
 
   weight <- cropAreaAll[, fyears, ]
   weight[!is.finite(intensity)] <- 0

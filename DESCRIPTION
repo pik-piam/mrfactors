@@ -1,8 +1,8 @@
 Type: Package
 Package: mrfactors
 Title: MADRaT based package on factor inputs
-Version: 0.10.0
-Date: 2026-01-26
+Version: 0.11.0
+Date: 2026-01-27
 Authors@R:
     c(person("Debbora", "Leip", , "leip@pik-potsdam.de", role = c("aut", "cre")),
       person("Edna", "Molina Bacca", role = "aut"))
