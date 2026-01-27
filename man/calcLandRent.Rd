@@ -4,10 +4,12 @@
 \alias{calcLandRent}
 \title{calcLandRent}
 \usage{
-calcLandRent(unit = "constant 2017 US$MER")
+calcLandRent(unit = "constant 2017 US$MER", rent = "cropland")
 }
 \arguments{
 \item{unit}{output currency unit based on the toolConvertGDP function from the  GDPuc library}
+
+\item{rent}{rent type cropland average "cropland" or per crop type "perCrop"}
 }
 \value{
 magpie object of the land factor requirements in USD/ha per crop
