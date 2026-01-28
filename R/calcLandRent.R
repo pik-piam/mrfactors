@@ -25,8 +25,8 @@ calcLandRent <- function(unit = "constant 2017 US$MER", rent = "cropland") {
 
   }
 
-  cropAreaAll[cropAreaAll < 1e-4] <- NA # remove very small values to avoid strange results when dividing
-  vopCrops[vopCrops < 1e-5] <- NA # remove very small values to avoid strange results when dividing
+  cropAreaAll[cropAreaAll < 1e-4] <- 0 # remove very small values to avoid strange results when dividing
+  vopCrops[vopCrops < 1e-5] <- 0 # remove very small values to avoid strange results when dividing
 
   if (rent == "perCrop") gnames <- intersect(getNames(vopCrops), getNames(cropAreaAll))
   gyears <- intersect(getYears(vopCrops), getYears(cropAreaAll))
@@ -47,7 +47,7 @@ calcLandRent <- function(unit = "constant 2017 US$MER", rent = "cropland") {
   if (rent == "perCrop") intensity[, , c("begr", "betr")] <- intensity[, , c("maiz")]
 
   # strange behavior in  PSE ans MUS
-  intensity[c("PSE", "MUS"), , ] <- NA
+  intensity[c("PSE", "MUS"), , ] <- 0
 
   weight <- cropAreaAll[, fyears, ]
   weight[!is.finite(intensity)] <- 0
