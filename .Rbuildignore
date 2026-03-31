@@ -9,3 +9,5 @@
 ^.*CITATION.cff$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.claude$
+^_pkgdown\.yml$
