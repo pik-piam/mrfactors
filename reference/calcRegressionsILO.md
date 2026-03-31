@@ -1,0 +1,71 @@
+# regressionsILO
+
+Calculates regression coefficients used by calc functions for ILO data
+sets
+
+## Usage
+
+``` r
+calcRegressionsILO(
+  subtype = "AgEmplShare",
+  dataVersionILO = "Aug24",
+  thresholdWage = 0.1,
+  forceWageIntercept = TRUE,
+  wageRegrType = NULL,
+  recalculate = FALSE
+)
+```
+
+## Arguments
+
+- subtype:
+
+  specifies the regression type: "AgEmplShare" for a regression between
+  the square root of the share of people employed in agriculture (out of
+  total population) and the log (base 10) of GDP pc PPP05.
+  "HourlyLaborCosts" for a regression between mean nominal hourly labor
+  cost per employee in agriculture and GDP pc MER05.
+
+- dataVersionILO:
+
+  which version of the ILO input data and regression to use. "" for the
+  oldest version and old regression, or "monthYear" (e.g. "Aug24") for
+  newer data with the new regression type
+
+- thresholdWage:
+
+  only relevant for linear hourly labor cost regression: for low GDP pc
+  MER, the regression between hourly labor costs and GDP pc MER can lead
+  to unreasonably low or even negative hourly labor costs. Therefore, we
+  set all hourly labor costs below this threshold to the threshold.
+
+- forceWageIntercept:
+
+  only relevant for linear hourly labor cost regression: If TRUE, the
+  wage threshold is also used as intercept of the regression. If FALSE,
+  the intercept is determined by the regression
+
+- wageRegrType:
+
+  Only relevant for HourlyLaborCosts regression. If NULL, a linear
+  regression will be used for the oldest data (dataVersionILO: ""), and
+  a loglog regression for all newer data. Can be overwritten by
+  specifically setting wageRegrType to "linear" or "loglog".
+
+- recalculate:
+
+  whether regression should be read from source folder, or recalculated
+  from scratch. Recalculation can lead to new regression coefficients if
+  data changed, and result should always be checked.
+
+## Author
+
+Debbora Leip
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+    a <- calcOutput("RegressionsILO", subtype = "HourlyLaborCosts")
+} # }
+```

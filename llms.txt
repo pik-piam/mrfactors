@@ -1,0 +1,122 @@
+# MADRaT based package on factor inputs
+
+R package **mrfactors**, version **0.12.0**
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/mrfactors)](https://cran.r-project.org/package=mrfactors)
+[![R build
+status](https://github.com/pik-piam/mrfactors/workflows/check/badge.svg)](https://github.com/pik-piam/mrfactors/actions)
+[![codecov](https://codecov.io/gh/pik-piam/mrfactors/branch/master/graph/badge.svg)](https://app.codecov.io/gh/pik-piam/mrfactors)
+[![r-universe](https://pik-piam.r-universe.dev/badges/mrfactors)](https://pik-piam.r-universe.dev/builds)
+
+## Purpose and Functionality
+
+This package provides functions for MAgPIE input data on factor inputs
+to agricultural production (with a focus on capital and labor).
+
+## Installation
+
+For installation of the most recent package version an additional
+repository has to be added in R:
+
+``` r
+options(repos = c(CRAN = "@CRAN@", pik = "https://rse.pik-potsdam.de/r/packages"))
+```
+
+The additional repository can be made available permanently by adding
+the line above to a file called `.Rprofile` stored in the home folder of
+your system (`Sys.glob("~")` in R returns the home directory).
+
+After that the most recent version of the package can be installed using
+`install.packages`:
+
+``` r
+install.packages("mrfactors")
+```
+
+Package updates can be installed using `update.packages` (make sure that
+the additional repository has been added before running that command):
+
+``` r
+update.packages()
+```
+
+## Questions / Problems
+
+In case of questions / problems please contact Debbora Leip
+<leip@pik-potsdam.de>.
+
+## Citation
+
+To cite package **mrfactors** in publications use:
+
+Leip D, Molina Bacca E (2026). “mrfactors: MADRaT based package on
+factor inputs.” Version: 0.12.0,
+<https://github.com/pik-piam/mrfactors>.
+
+A BibTeX entry for LaTeX users is
+
+``` latex
+@Misc{,
+ title = {mrfactors: MADRaT based package on factor inputs},
+ author = {Debbora Leip and Edna {Molina Bacca}},
+ date = {2026-03-31},
+ year = {2026},
+ url = {https://github.com/pik-piam/mrfactors},
+ note = {Version: 0.12.0},
+}
+```
+
+# Package index
+
+## All functions
+
+- [`calcAgCapLabourShare()`](calcAgCapLabourShare.md) :
+  calcAgCapLabourShare
+- [`calcAgEmplILO()`](calcAgEmplILO.md) : calcAgEmplILO
+- [`calcFacReq()`](calcFacReq.md) : calcFacReq
+- [`calcFacReqGLO()`](calcFacReqGLO.md) : calcFacReqGLO
+- [`calcFactorCosts()`](calcFactorCosts.md) : calcFactorCosts
+- [`calcFactorCostsCrops()`](calcFactorCostsCrops.md) :
+  calcFactorCostsCrops
+- [`calcFactorCostsLivst()`](calcFactorCostsLivst.md) :
+  calcFactorCostsLivst
+- [`calcFactorIntensity()`](calcFactorIntensity.md) :
+  calcFactorIntensity
+- [`calcFractionInputsUSDA()`](calcFractionInputsUSDA.md) :
+  calcFractionInputsUSDA
+- [`calcHourlyLaborCosts()`](calcHourlyLaborCosts.md) :
+  calcHourlyLaborCosts
+- [`calcIFPRIsubsidy()`](calcIFPRIsubsidy.md) : calcIFPRIsubsidy
+- [`calcLaborCosts()`](calcLaborCosts.md) : calcLaborCosts
+- [`calcLandRent()`](calcLandRent.md) : calcLandRent
+- [`calcNonMAgPIEFactorCosts()`](calcNonMAgPIEFactorCosts.md) :
+  calcNonMAgPIEFactorCosts
+- [`calcPricesProducer()`](calcPricesProducer.md) : calcPricesProducer
+- [`calcProductionCosts()`](calcProductionCosts.md) :
+  calcProductionCosts
+- [`calcRegFactorShare()`](calcRegFactorShare.md) : calcRegFactorShare
+- [`calcRegressionsILO()`](calcRegressionsILO.md) : regressionsILO
+- [`calcVoPAFF()`](calcVoPAFF.md) : calcVoPAFF
+- [`calcVoPcrops()`](calcVoPcrops.md) : calcVoPcrops
+- [`calcVoPlivst()`](calcVoPlivst.md) : calcVoPlivst
+- [`calcWeeklyHoursILO()`](calcWeeklyHoursILO.md) : calcWeeklyHoursILO
+- [`convertIFPRIsubsidy()`](convertIFPRIsubsidy.md) :
+  convertIFPRIsubsidy
+- [`convertILOSTAT()`](convertILOSTAT.md) : convertILOSTAT
+- [`convertVittis()`](convertVittis.md) : convertVittis
+- [`correctTFPUSDA()`](correctTFPUSDA.md) : correctTFPUSDA
+- [`correctVittis()`](correctVittis.md) : correctVittis
+- [`downloadILOSTAT()`](downloadILOSTAT.md) : downloadILOSTAT
+- [`downloadTFPUSDA()`](downloadTFPUSDA.md) : downloadTFPUSDA
+- [`mrfactors-package`](mrfactors-package.md)
+  [`mrfactors`](mrfactors-package.md) : MADRaT based package on factor
+  inputs
+- [`readHourlyLaborCostsChina()`](readHourlyLaborCostsChina.md) :
+  readHourlyLaborCostsChina
+- [`readIFPRIsubsidy()`](readIFPRIsubsidy.md) : readIFPRIsubsidy
+- [`readILOSTAT()`](readILOSTAT.md) : readILOSTAT
+- [`readRegressionsILO()`](readRegressionsILO.md) : readRegressionsILO
+- [`readTFPUSDA()`](readTFPUSDA.md) : readTFPUSDA
+- [`readVittis()`](readVittis.md) : readVittis
+
