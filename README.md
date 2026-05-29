@@ -1,8 +1,8 @@
 # MADRaT based package on factor inputs
 
-R package **mrfactors**, version **0.12.0**
+R package **mrfactors**, version **0.13.0**
 
-[![CRAN status](https://www.r-pkg.org/badges/version/mrfactors)](https://cran.r-project.org/package=mrfactors) [![R build status](https://github.com/pik-piam/mrfactors/workflows/check/badge.svg)](https://github.com/pik-piam/mrfactors/actions) [![codecov](https://codecov.io/gh/pik-piam/mrfactors/branch/master/graph/badge.svg)](https://app.codecov.io/gh/pik-piam/mrfactors) [![r-universe](https://pik-piam.r-universe.dev/badges/mrfactors)](https://pik-piam.r-universe.dev/builds)
+   [![R build status](https://github.com/pik-piam/mrfactors/workflows/check/badge.svg)](https://github.com/pik-piam/mrfactors/actions) [![codecov](https://codecov.io/gh/pik-piam/mrfactors/branch/master/graph/badge.svg)](https://app.codecov.io/gh/pik-piam/mrfactors) [![r-universe](https://pik-piam.r-universe.dev/badges/mrfactors)](https://pik-piam.r-universe.dev/builds)
 
 ## Purpose and Functionality
 
@@ -20,13 +20,13 @@ The additional repository can be made available permanently by adding the line a
 
 After that the most recent version of the package can be installed using `install.packages`:
 
-```r 
+```r
 install.packages("mrfactors")
 ```
 
 Package updates can be installed using `update.packages` (make sure that the additional repository has been added before running that command):
 
-```r 
+```r
 update.packages()
 ```
 
@@ -38,7 +38,7 @@ In case of questions / problems please contact Debbora Leip <leip@pik-potsdam.de
 
 To cite package **mrfactors** in publications use:
 
-Leip D, Molina Bacca E (2026). "mrfactors: MADRaT based package on factor inputs." Version: 0.12.0, <https://github.com/pik-piam/mrfactors>.
+Leip D, Molina Bacca E (2026). "mrfactors: MADRaT based package on factor inputs." Version: 0.13.0, <https://github.com/pik-piam/mrfactors>.
 
 A BibTeX entry for LaTeX users is
 
@@ -46,9 +46,9 @@ A BibTeX entry for LaTeX users is
 @Misc{,
   title = {mrfactors: MADRaT based package on factor inputs},
   author = {Debbora Leip and Edna {Molina Bacca}},
-  date = {2026-03-31},
+  date = {2026-05-29},
   year = {2026},
   url = {https://github.com/pik-piam/mrfactors},
-  note = {Version: 0.12.0},
+  note = {Version: 0.13.0},
 }
 ```

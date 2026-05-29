@@ -134,8 +134,7 @@ calcAgEmplILO <- function(subsectors = TRUE, inclFish = FALSE, inclForest = FALS
 
   sharesAgEmpl <- .calcShares(agEmpltotal)
 
-  # shares between crop and livestock based on VoP (in mio. current USDMER, as currency is irrelevant for shares between
-  # sectors)
+  # shares between crop and livestock based on VoP (in mio. current USDMER)
   ag <- list(c("2041|Crops", "2044|Livestock"), "Gross_Production_Value_(current_thousand_US$)_(1000_US$)")
   vop <- readSource("FAO_online", "ValueOfProd")[, , ag, drop = TRUE] / 1000 # mio current USDMER
   getNames(vop) <- str_split(getNames(vop), "\\|", simplify = TRUE)[, 2]

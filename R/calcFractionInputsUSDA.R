@@ -95,6 +95,8 @@ calcFractionInputsUSDA <- function(products = "kcr", keepConstantExtrapolation =
   tfpShares <- tfpShares[, years, ]
 
   # mio. USD VoP (constant 2014_2016 thousand US$ has values before 1991, current_thousand_US$ does not)
+  # Explanation: FAO uses global constant average prices multiplying with production quantity to get VoP.
+  # This allows to have a longer timeseries, but also masks some of the country-specific dynamics.
   vopCrops <- voPAll[, ,  "2041|Crops.Gross_Production_Value_(constant_2014_2016_thousand_US$)_(1000_US$)"] / 1000
   vopLivst <- voPAll[, , "2044|Livestock.Gross_Production_Value_(constant_2014_2016_thousand_US$)_(1000_US$)"] / 1000
   ratio <- collapseDim(vopCrops / (vopCrops + vopLivst))

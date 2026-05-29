@@ -26,14 +26,14 @@ calcVoPlivst <- function(other = FALSE, fillGaps = TRUE, unit = "constant 2017 U
   if (isFALSE(other)) {
     mappingFAO <- mappingFAO[mappingFAO$kli != "livst_other", ]
   }
-  items <- mappingFAO$post1124_FAO_Item
+  items <- intersect(mappingFAO$post0226_FAO_Item, getNames(vop, dim = 1))
 
   # aggregation to magpie objects (and livst_other)
-  vopLivst <- toolAggregate(vop[, , items], rel = mappingFAO,
-                            from = "post1124_FAO_Item", to = "kli",
+  vopLivst <- toolAggregate(vop[, , items], rel = mappingFAO[mappingFAO$post0226_FAO_Item %in% items, ],
+                            from = "post0226_FAO_Item", to = "kli",
                             weight = NULL, dim = 3)
 
-  # VoP in North Korea too high? -> excluded
+  # VoP in North Korea only three isolated values for milk --> excluded
   vopLivst["PRK", , ] <- 0
 
   # filling gaps based on production and prices

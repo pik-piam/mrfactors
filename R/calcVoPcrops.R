@@ -19,10 +19,7 @@
 calcVoPcrops <- function(fillGaps = TRUE, unit = "constant 2017 US$MER") {
   # Value of production of individual items (US$MER17)
   item <- "Gross_Production_Value_(USDMER17)_(1000_US$)"
-  vopAll <- readSource("FAO_online", "ValueOfProd")[, , item] / 1000 # mio. US$MER17
-
-  getNames(vopAll) <- gsub("\\..*", "", getNames(vopAll))
-  getNames(vopAll)[getNames(vopAll) == "254|Oil palm fruit"] <- "254|Oil, palm fruit"
+  vopAll <- readSource("FAO_online", "ValueOfProd")[, , item, drop = TRUE] / 1000 # mio. US$MER17
 
   # items for aggregation
   mappingFAO <- toolGetMapping("FAO2LUH2MAG_croptypes.csv", type = "sectoral", where = "mrlandcore")
@@ -33,7 +30,7 @@ calcVoPcrops <- function(fillGaps = TRUE, unit = "constant 2017 US$MER") {
   vopKcrAggregated <- toolAggregate(vopAll[, , itemsIntersect], rel = mappingFAO, from = "ProductionItem",
                                     to = "kcr", weight = NULL, dim = 3)
 
-  # VoP in North Korea too high? -> excluded
+  # VoP in North Korea only three isolated values for maiz and soybean --> excluded
   vopKcrAggregated["PRK", , ] <- 0
 
   # filling gaps based on production and prices (only works for 1991-2013, other years stay the same)
