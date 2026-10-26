@@ -8,38 +8,50 @@ import(mrdrivers)
 import(mrlandcore)
 import(mstools)
 importFrom(GDPuc,toolConvertGDP)
-importFrom(dplyr,"%>%")
-importFrom(dplyr,all_of)
-importFrom(dplyr,arrange)
-importFrom(dplyr,intersect)
-importFrom(dplyr,select)
-importFrom(luscale,speed_aggregate)
-importFrom(luscale,superAggregate)
+importFrom(dplyr,
+  "%>%",
+  all_of,
+  arrange,
+  intersect,
+  select
+)
+importFrom(luscale,
+  speed_aggregate,
+  superAggregate
+)
 importFrom(madrat,calcOutput)
-importFrom(magclass,"getNames<-")
-importFrom(magclass,as.magpie)
-importFrom(magclass,collapseDim)
-importFrom(magclass,collapseNames)
-importFrom(magclass,complete_magpie)
-importFrom(magclass,dimSums)
-importFrom(magclass,getCells)
-importFrom(magclass,getRegions)
-importFrom(magclass,getSets)
-importFrom(magclass,getYears)
-importFrom(magclass,magpiesort)
-importFrom(magclass,read.magpie)
-importFrom(magclass,setNames)
-importFrom(magclass,time_interpolate)
-importFrom(magclass,where)
+importFrom(magclass,
+  "getNames<-",
+  as.magpie,
+  collapseDim,
+  collapseNames,
+  complete_magpie,
+  dimSums,
+  getCells,
+  getRegions,
+  getSets,
+  getYears,
+  magpiesort,
+  read.magpie,
+  setNames,
+  time_interpolate,
+  where
+)
 importFrom(magpiesets,findset)
 importFrom(readxl,read_excel)
-importFrom(stats,lm)
-importFrom(stats,reshape)
-importFrom(stringr,str_extract)
-importFrom(stringr,str_split)
-importFrom(stringr,str_to_title)
-importFrom(utils,download.file)
-importFrom(utils,person)
-importFrom(utils,read.csv)
-importFrom(utils,read.table)
-importFrom(utils,write.table)
+importFrom(stats,
+  lm,
+  reshape
+)
+importFrom(stringr,
+  str_extract,
+  str_split,
+  str_to_title
+)
+importFrom(utils,
+  download.file,
+  person,
+  read.csv,
+  read.table,
+  write.table
+)

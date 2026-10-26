@@ -1,8 +1,8 @@
 Type: Package
 Package: mrfactors
 Title: MADRaT based package on factor inputs
-Version: 0.13.0
-Date: 2026-05-29
+Version: 0.14.0
+Date: 2026-10-26
 Authors@R:
     c(person("Debbora", "Leip", , "leip@pik-potsdam.de", role = c("aut", "cre")),
       person("Edna", "Molina Bacca", role = "aut"))
@@ -29,5 +29,5 @@ Suggests:
     Rilostat,
     testthat
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 Config/Needs/website: tidyverse/tidytemplate
+Config/roxygen2/version: 8.1.0

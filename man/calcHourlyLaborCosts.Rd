@@ -9,7 +9,7 @@ calcHourlyLaborCosts(
   dataVersionILO = "Aug24",
   sector = "agriculture",
   fillWithRegression = TRUE,
-  calibYear = 2010,
+  calibYear = 2015,
   cutAfterCalibYear = TRUE,
   projection = FALSE
 )
