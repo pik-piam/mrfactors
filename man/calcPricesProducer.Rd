@@ -34,5 +34,5 @@ a <- calcOutput("PricesProducer")
 [calcOutput()]
 }
 \author{
-Edna J. Molina Bacca
+Edna J. Molina Bacca, Bin Lin
 }
