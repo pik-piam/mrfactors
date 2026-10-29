@@ -133,7 +133,7 @@ calcPricesProducer <- function(products = "kcr", calculation = "VoP", weighting 
       # get new mapping
       mappingFAO <- toolGetMapping("FAOitems_online_2010update.csv", type = "sectoral", where = "mrfaocore")
 
-      weightProd <- collapseNames(readSource("FAO_online", "LivePrim2024")[, , "Production_(t)"])
+      weightProd <- collapseNames(readSource("FAO_online", "LiveHead2024")[, , "Production_(t)"])
       if (weighting == "production") {
         itemsIntersect <- intersect(getNames(pricesProdFAO), unique(mappingFAO$post2010_ProductionItem))
         # Prod. of livestock primary prod
