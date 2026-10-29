@@ -44,8 +44,10 @@ calcLaborCosts <- function(datasource = "ILO", dataVersionILO = "Aug24", subsect
 
     # mean nominal hourly labor cost per employee in agriculture (US$2017MER/h) based on USDA_FAO calculation
     # and regression based on ILO raw data
+    # all available ILO data is used (calibYear = NULL, cutAfterCalibYear = FALSE), regression only fills gaps
     iloLaborCosts <- calcOutput("HourlyLaborCosts", dataVersionILO = dataVersionILO, datasource = datasource,
-                                fillWithRegression = TRUE, projection = "SSP2", # scenario has no influence until 2020
+                                fillWithRegression = TRUE, calibYear = NULL, cutAfterCalibYear = FALSE,
+                                projection = "SSP2", # scenario has no influence until 2020
                                 aggregate = FALSE)[, years, ]
 
     # combine data sets to get total labor costs

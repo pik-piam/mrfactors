@@ -26,7 +26,7 @@
 
 
 calcHourlyLaborCosts <- function(datasource = "USDA_FAO", dataVersionILO = "Aug24", # nolint: cyclocomp_linter
-                                 sector = "agriculture", fillWithRegression = TRUE, calibYear = 2010,
+                                 sector = "agriculture", fillWithRegression = TRUE, calibYear = 2015,
                                  cutAfterCalibYear = TRUE, projection = FALSE) {
 
   if (datasource == "ILO" && sector != "agriculture") {
