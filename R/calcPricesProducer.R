@@ -7,7 +7,7 @@
 #' calculates as VoP/Production, only "FAO" available for "kli" products.
 #' @param weighting either "production" (default) or "consumption" based weighting
 #' @return magpie object. prices in year specific annual
-#' @author Edna J. Molina Bacca
+#' @author Edna J. Molina Bacca, Bin Lin
 #' @importFrom magpiesets findset
 #'
 #' @seealso [calcOutput()]
@@ -133,9 +133,7 @@ calcPricesProducer <- function(products = "kcr", calculation = "VoP", weighting 
       # get new mapping
       mappingFAO <- toolGetMapping("FAOitems_online_2010update.csv", type = "sectoral", where = "mrfaocore")
 
-      weightProd <- collapseNames(readSource("FAO_online", "LivePrim")[, , "production"])
-      weightProd <- toolAggregate(weightProd, rel = mappingFAO, from = "pre2010_ProductionItem",
-                                  to = "post2010_ProductionItem", partrel = TRUE, dim = 3)
+      weightProd <- collapseNames(readSource("FAO_online", "CropLive")[, , "Production_(t)"])
       if (weighting == "production") {
         itemsIntersect <- intersect(getNames(pricesProdFAO), unique(mappingFAO$post2010_ProductionItem))
         # Prod. of livestock primary prod
