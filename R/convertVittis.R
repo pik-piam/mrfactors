@@ -11,10 +11,12 @@ convertVittis <- function(x) {
   # map to MAgPIE categories with global crop areas as weights
   mapping <- toolGetMapping("VittisCropCategories.csv", type = "sectoral", where = "mrcommons")
 
-  weights <- calcOutput("Croparea",
-                        sectoral = "ProductionItem",
-                        aggregate = "GLO")[, "y2000", unique(mapping[, "ProductionItem"])] %>%
-    toolAggregate(mapping, from = "ProductionItem", to = "Vittis", dim = 3)
+  temp <- calcOutput("CropareaFAOLUH",
+                     sectoral = "ProductionItem",
+                     aggregate = "GLO")[, "y2000", unique(mapping[, "ProductionItem"])]
+
+  weights <- toolAggregate(temp, mapping, from = "ProductionItem", to = "Vittis", dim = 3)
+
   x <- toolAggregate(x, mapping, weight = weights, from = "Vittis", to = "kcr", dim = 3.2)
 
   # Convert from "constant 2000 Int$PPP" to "constant 2017 US$MER"
